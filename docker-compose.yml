@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  # Local Ollama service with GPU / CPU support
+  ollama:
+    image: ollama/ollama:latest
+    container_name: hostel_ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    restart: unless-stopped
+
+  # Hostel Triage Web App
+  web:
+    build: .
+    container_name: hostel_triage_web
+    ports:
+      - "5001:5001"
+    environment:
+      - OLLAMA_HOST=http://ollama:11434
+      - PORT=5001
+    depends_on:
+      - ollama
+    restart: unless-stopped
+
+volumes:
+  ollama_data:

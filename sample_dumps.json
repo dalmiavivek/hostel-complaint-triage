@@ -1,0 +1,22 @@
+{
+  "presets": [
+    {
+      "id": "monsoon_storm",
+      "title": "🌧️ Scenario 1: Monsoon Storm & Power Glitch (High Emergency)",
+      "description": "Critical electrical sparks, flooding corridor, sick student, and cold mess food.",
+      "raw_text": "[11:02 PM] Rohan (B-204): Bro water leaking from ceiling right above fan switch! Sparks are flying!! Please cut main power URGENT!!\n[11:05 PM] Anonymous: mess dinner was completely cold and dal got over early\n[11:08 PM] Ananya 312: My roommate Priyanshi has 103 fever and keeps vomiting, warden ma'am please send doctor or medical car ASAP\n[11:11 PM] Kabir: lift 2 is making grinding noise and stuck between 2nd and 3rd floor someone is inside banging\n[11:15 PM] Tanmay 104: Wi-Fi on 1st floor Wing B is completely dead since 7 PM, assignment submission due at midnight!\n[11:18 PM] Student Rep: 4th floor common washroom tap broken water flooding into corridor\n[11:21 PM] Anonymous: Bhai room me bada lizard hai please kisi safai wale ko bhejo"
+    },
+    {
+      "id": "exam_week",
+      "title": "📚 Scenario 2: Midnight Exam Week Panic",
+      "description": "Electric shock hazard, terrace disturbance, injured student, and AC breakdown.",
+      "raw_text": "[01:14 AM] Sahil (Room 215): Water cooler near water dispenser Wing C is giving mild electric shocks when touching tap! Don't drink from it!\n[01:22 AM] Vivek 108: Geyser switch in our bathroom started smoking and burning plastic smell. Turned it off.\n[01:35 AM] Kunal: wing C terrace people playing loud speaker songs we have end-sem exam in 7 hours\n[01:40 AM] Ayush 304: Ankit twisted ankle on stairs, swelling badly cannot walk need ice pack and assistance\n[01:52 AM] Deep B-412: AC fan making screeching noise and blowing hot air room is baking\n[02:01 AM] Gaurav: clothes stolen from 3rd floor drying area again"
+    },
+    {
+      "id": "daily_mix",
+      "title": "☕ Scenario 3: Mixed Daily Hostel Chatter",
+      "description": "Standard daily complaints with slang, missing rooms, and varied priorities.",
+      "raw_text": "[09:15 AM] hostel resident: flush not working in ground floor washroom\n[09:30 AM] Dev 201: Main door lock jammed, we are locked inside room\n[10:05 AM] Shreya 402: Stray dog entered 4th floor corridor barking at students\n[10:40 AM] Parth 118: Table light plug point dead, electrician please\n[11:15 AM] rahul: canteen guy charging 5 rs extra for cold drink\n[11:45 AM] Siddharth B-301: ceiling fan regulator loose only runs at speed 5"
+    }
+  ]
+}

@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Hostel Complaint Triage • Warden Copilot</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  
+  <style>
+    /* Natural Woodish Texture & Subtle Wood Grain Stripes */
+    :root {
+      --wood-dark: #3E2919;      /* Dark Walnut */
+      --wood-medium: #6E4E32;    /* Cedar / Teak */
+      --wood-light: #C9B29B;     /* Oak / Birch */
+      --wood-cream: #FAF5ED;     /* Clean Maple Parchment */
+      --wood-border: #D8C4AA;    /* Board Edge */
+    }
+
+    body {
+      background-color: #EFE4D3;
+      /* Realistic fine horizontal wood grain stripes */
+      background-image: 
+        repeating-linear-gradient(
+          0deg,
+          rgba(110, 78, 50, 0.04) 0px,
+          rgba(110, 78, 50, 0.04) 2px,
+          rgba(255, 255, 255, 0.05) 2px,
+          transparent 6px
+        ),
+        repeating-linear-gradient(
+          0deg,
+          rgba(85, 55, 30, 0.02) 0px,
+          rgba(85, 55, 30, 0.02) 1px,
+          transparent 1px,
+          transparent 18px
+        ),
+        linear-gradient(160deg, #F5ECE0 0%, #EBDBC8 50%, #E2CFB8 100%);
+      color: #38281B;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Wooden plank header stripe accent */
+    .wood-plank-stripes {
+      background-image: repeating-linear-gradient(
+        90deg,
+        rgba(100, 68, 40, 0.08) 0px,
+        rgba(100, 68, 40, 0.08) 3px,
+        transparent 3px,
+        transparent 16px
+      );
+    }
+
+    /* Fine wood grain card accent */
+    .wood-card {
+      background: #FDF9F3;
+      border: 1px solid #D8C5AB;
+      box-shadow: 0 2px 8px -1px rgba(62, 41, 25, 0.07), 0 1px 3px -1px rgba(62, 41, 25, 0.04);
+    }
+
+    .wood-grain-subtle {
+      background-image: repeating-linear-gradient(
+        0deg,
+        rgba(110, 78, 50, 0.03) 0px,
+        rgba(110, 78, 50, 0.03) 1px,
+        transparent 1px,
+        transparent 5px
+      );
+    }
+
+    .wood-btn {
+      transition: all 0.15s ease-in-out;
+    }
+    .wood-btn:active {
+      transform: scale(0.98);
+    }
+
+    .custom-scroll::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: #C4AC91;
+      border-radius: 9999px;
+    }
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col font-sans antialiased">
+
+  <!-- Wood Plank Topbar -->
+  <header class="bg-[#FBF6EE] border-b-2 border-[#D5C1A6] sticky top-0 z-40 shadow-xs relative">
+    <!-- Subtle top grain accent stripe -->
+    <div class="h-1 w-full bg-gradient-to-r from-[#8C5E37] via-[#C9A279] to-[#8C5E37] opacity-80"></div>
+    
+    <div class="max-w-5xl mx-auto px-3.5 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between gap-2">
+      <!-- Brand & Title -->
+      <div class="flex items-center gap-2.5 min-w-0">
+        <div class="w-9 h-9 sm:w-10 sm:h-10 shrink-0 rounded-xl bg-[#E8D7C0] border border-[#CCA77F] flex items-center justify-center text-lg sm:text-xl shadow-inner">
+          🪵
+        </div>
+        <div class="min-w-0">
+          <div class="flex items-center gap-1.5 flex-wrap">
+            <h1 class="font-black text-sm sm:text-base text-[#3A2617] tracking-tight truncate">
+              Hostel Triage
+            </h1>
+            <span class="bg-[#E4D1B9] text-[#5C3B1E] border border-[#CCA77F] text-[10px] font-bold px-1.5 py-0.2 rounded-full uppercase tracking-wider shrink-0">
+              Warden Copilot
+            </span>
+          </div>
+          <p class="text-[11px] text-[#78593F] truncate hidden sm:block">
+            Messy chats &rarr; 60-second sorted human action items
+          </p>
+        </div>
+      </div>
+
+      <!-- Right Status & Model Pill -->
+      <div class="flex items-center gap-2 shrink-0">
+        <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#E8EFE3] border border-[#BFD4B5] text-[#2F5A24] text-[11px] font-semibold">
+          <span class="w-2 h-2 rounded-full bg-[#34A853] animate-pulse"></span>
+          <span class="hidden sm:inline">Gemma 4 Online</span>
+          <span class="sm:hidden">Online</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="max-w-5xl mx-auto px-3.5 sm:px-6 py-4 sm:py-6 flex-1 w-full space-y-4 sm:space-y-6">
+
+    <!-- Hero / Problem Statement Card (Wood Plaque Style) -->
+    <div class="wood-card wood-grain-subtle rounded-2xl p-4 sm:p-6 relative overflow-hidden border-[#CFBBA2]">
+      <!-- Decorative left vertical wood stripe edge -->
+      <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-gradient-to-b from-[#8C5E37] via-[#B88656] to-[#6E4826]"></div>
+      
+      <div class="space-y-2.5 pl-1.5 sm:pl-2">
+        <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-[#E8D9C5] text-[#543820] text-[11px] font-mono font-bold border border-[#CCAFA0]">
+          <span>📌 Problem Statement</span>
+          <span class="opacity-40">•</span>
+          <span>Hostel Complaint Triage</span>
+        </div>
+        
+        <h2 class="text-lg sm:text-2xl font-black text-[#382618] tracking-tight leading-snug">
+          Turn frantic WhatsApp chats into a clean, prioritized triage board.
+        </h2>
+        
+        <p class="text-xs sm:text-sm text-[#5C4533] leading-relaxed">
+          Hostel complaints arrive as messy messages — slang, missing room numbers, urgent and routine issues mixed together. Wardens sort them by hand and safety risks get buried. Gemma 4 reads the unformatted chat and outputs a 1-minute skim list.
+        </p>
+
+        <!-- Feature Badges (Warm Woodish Tones) -->
+        <div class="pt-1 flex flex-wrap gap-1.5 text-[11px] font-medium">
+          <span class="bg-[#F8E2DA] text-[#912B10] border border-[#ECC0B2] px-2 py-0.5 rounded-md flex items-center gap-1 font-semibold">
+            <span class="w-1.5 h-1.5 rounded-full bg-[#BC3815]"></span> Urgent Safety First
+          </span>
+          <span class="bg-[#FDF0D5] text-[#875505] border border-[#F6D799] px-2 py-0.5 rounded-md flex items-center gap-1 font-semibold">
+            <span class="w-1.5 h-1.5 rounded-full bg-[#D97706]"></span> Room Detection
+          </span>
+          <span class="bg-[#E7EEE4] text-[#2C5424] border border-[#C6DAC2] px-2 py-0.5 rounded-md flex items-center gap-1 font-semibold">
+            <span class="w-1.5 h-1.5 rounded-full bg-[#467E3A]"></span> 100% Private (Local)
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1-Click Demo Scenarios (Carved Wooden Button Tiles) -->
+    <div class="wood-card rounded-xl p-3 sm:p-4 border-[#D8C5AB] space-y-2">
+      <div class="flex items-center justify-between">
+        <span class="text-[11px] sm:text-xs font-black text-[#5C3F28] uppercase tracking-wider flex items-center gap-1">
+          <span>⚡</span> <span>1-Click Demo Presets:</span>
+        </span>
+        <span class="text-[10px] sm:text-xs text-[#87664B]">Tap to load</span>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+        <button onclick="loadPreset('monsoon_storm')" class="wood-btn text-xs bg-[#EBF0F6] hover:bg-[#D9E4EF] text-[#1B4B84] border border-[#B7CEE5] px-3 py-2 rounded-lg font-bold flex items-center justify-center sm:justify-start gap-1.5 shadow-xs">
+          <span>🌧️</span> <span class="truncate">Monsoon Storm & Sparks</span>
+        </button>
+        <button onclick="loadPreset('exam_week')" class="wood-btn text-xs bg-[#FAF0E6] hover:bg-[#F3DECA] text-[#9A4B12] border border-[#F2CAA7] px-3 py-2 rounded-lg font-bold flex items-center justify-center sm:justify-start gap-1.5 shadow-xs">
+          <span>📚</span> <span class="truncate">Midnight Exam Panic</span>
+        </button>
+        <button onclick="loadPreset('daily_mix')" class="wood-btn text-xs bg-[#EDE2D2] hover:bg-[#E2D2BD] text-[#543E2B] border border-[#D1BEA8] px-3 py-2 rounded-lg font-bold flex items-center justify-center sm:justify-start gap-1.5 shadow-xs">
+          <span>☕</span> <span class="truncate">Daily Mixed Chatter</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Chat Dump Input Box (Warm Birch Notepad) -->
+    <div class="wood-card rounded-2xl p-4 sm:p-6 border-[#D8C5AB] space-y-3">
+      <div class="flex items-start justify-between gap-2">
+        <div>
+          <h3 class="font-extrabold text-sm text-[#382618] flex items-center gap-1.5">
+            <span>💬</span> <span>Hostel Chat Dump</span>
+          </h3>
+          <p class="text-[11px] text-[#7A5B42] mt-0.5">
+            Paste unedited WhatsApp/Telegram messages below:
+          </p>
+        </div>
+        <button onclick="clearInput()" class="text-xs font-bold text-[#7A5B42] hover:text-[#BC3815] px-2.5 py-1 rounded bg-[#E8D9C5] border border-[#CFBBA2] shrink-0">
+          Clear Text
+        </button>
+      </div>
+
+      <textarea 
+        id="chatDumpInput" 
+        rows="4" 
+        placeholder="Paste student chat dump here...
+[11:02 PM] Rohan (B-204): Water leaking on fan switch sparks flying!!
+[11:05 PM] Anonymous: mess food cold
+[11:08 PM] Ananya 312: Roommate has 103 fever and vomiting please help..."
+        class="w-full rounded-xl border-2 border-[#D4C1A8] bg-[#FDFBF7] p-3 sm:p-4 font-mono text-xs text-[#382618] focus:bg-white focus:border-[#8C5E37] focus:ring-2 focus:ring-[#8C5E37]/25 focus:outline-none transition custom-scroll leading-relaxed"
+      ></textarea>
+
+      <!-- Bottom controls -->
+      <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-1">
+        <div class="text-[11px] text-[#7A5B42] flex items-center justify-center sm:justify-start gap-1.5">
+          <span class="inline-block w-2 h-2 rounded-full bg-[#467E3A]"></span>
+          <span>Engine: <strong class="text-[#382618]">Gemma 4</strong> (Local Ollama)</span>
+        </div>
+
+        <button 
+          id="triageBtn" 
+          onclick="runTriage()" 
+          class="wood-btn w-full sm:w-auto px-6 py-3.5 rounded-xl bg-[#3E2919] hover:bg-[#523722] text-[#FDF8F0] font-black text-sm shadow-md transition flex items-center justify-center gap-2 border border-[#2B1B10]"
+        >
+          <span id="btnIcon">⚡</span>
+          <span id="btnText">Triage Complaints with Gemma 4</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Triage Results Section -->
+    <div id="resultsSection" class="hidden space-y-4 sm:space-y-6">
+
+      <!-- Executive Metric Counters (Rich Woodish Accents) -->
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3">
+        <!-- Total -->
+        <div class="wood-card rounded-xl p-3 sm:p-4 border-[#D8C5AB]">
+          <p class="text-[10px] sm:text-[11px] font-bold text-[#7A5B42] uppercase tracking-wider">Total Complaints</p>
+          <p id="metricTotal" class="text-xl sm:text-2xl font-black text-[#382618] mt-0.5">0</p>
+        </div>
+
+        <!-- Critical -->
+        <div class="bg-[#FDF0EB] border border-[#F6C9BA] rounded-xl p-3 sm:p-4 shadow-xs">
+          <div class="flex items-center justify-between">
+            <p class="text-[10px] sm:text-[11px] font-bold text-[#A63012] uppercase tracking-wider">🚨 Critical</p>
+            <span class="w-1.5 h-1.5 rounded-full bg-[#BC3815] animate-ping"></span>
+          </div>
+          <p id="metricCritical" class="text-xl sm:text-2xl font-black text-[#BC3815] mt-0.5">0</p>
+        </div>
+
+        <!-- High -->
+        <div class="bg-[#FDF4EB] border border-[#F8D4B4] rounded-xl p-3 sm:p-4 shadow-xs">
+          <p class="text-[10px] sm:text-[11px] font-bold text-[#A04D14] uppercase tracking-wider">⚠️ High Priority</p>
+          <p id="metricHigh" class="text-xl sm:text-2xl font-black text-[#BD5D1B] mt-0.5">0</p>
+        </div>
+
+        <!-- Medium / Low -->
+        <div class="bg-[#F6F3E9] border border-[#DFDAC4] rounded-xl p-3 sm:p-4 shadow-xs">
+          <p class="text-[10px] sm:text-[11px] font-bold text-[#635E44] uppercase tracking-wider">ℹ️ Routine / Med</p>
+          <p id="metricMedLow" class="text-xl sm:text-2xl font-black text-[#4E4931] mt-0.5">0</p>
+        </div>
+
+        <!-- Missing Rooms -->
+        <div class="col-span-2 sm:col-span-1 bg-[#F5F0F8] border border-[#DFCEEC] rounded-xl p-3 sm:p-4 shadow-xs">
+          <p class="text-[10px] sm:text-[11px] font-bold text-[#6B3E8E] uppercase tracking-wider">❓ Missing Rooms</p>
+          <p id="metricMissing" class="text-xl sm:text-2xl font-black text-[#7E4CA6] mt-0.5">0</p>
+        </div>
+      </div>
+
+      <!-- Action & Filter Bar (Wood Plank Layout) -->
+      <div class="wood-card rounded-xl p-3 sm:p-4 border-[#D8C5AB] flex flex-col md:flex-row md:items-center justify-between gap-3">
+        <!-- Filter Pills -->
+        <div class="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 no-scrollbar" id="filterPills">
+          <span class="text-[10px] font-bold text-[#7A5B42] uppercase shrink-0 mr-1">Filter:</span>
+          <button onclick="setFilter('all')" class="filter-pill active px-2.5 py-1 rounded-full text-xs font-bold bg-[#3E2919] text-[#FDF8F0] transition shrink-0">All</button>
+          <button onclick="setFilter('Critical')" class="filter-pill px-2.5 py-1 rounded-full text-xs font-bold bg-[#FDF0EB] text-[#A63012] border border-[#F6C9BA] hover:bg-[#FBE4DD] transition shrink-0">🔴 Critical</button>
+          <button onclick="setFilter('High')" class="filter-pill px-2.5 py-1 rounded-full text-xs font-bold bg-[#FDF4EB] text-[#A04D14] border border-[#F8D4B4] hover:bg-[#FBE9D6] transition shrink-0">🟠 High</button>
+          <button onclick="setFilter('missing')" class="filter-pill px-2.5 py-1 rounded-full text-xs font-bold bg-[#F5F0F8] text-[#6B3E8E] border border-[#DFCEEC] hover:bg-[#EFE5F6] transition shrink-0">❓ No Room</button>
+        </div>
+
+        <!-- Ground Action Buttons -->
+        <div class="flex items-center gap-2 pt-1 sm:pt-0">
+          <button 
+            onclick="copyWhatsAppDigest()" 
+            class="wood-btn flex-1 sm:flex-initial px-3.5 py-2 rounded-lg bg-[#2D5A27] hover:bg-[#22451E] text-white text-xs font-black shadow-sm transition flex items-center justify-center gap-1.5"
+            title="Formatted specifically for WhatsApp warden group"
+          >
+            <span>📲 Copy WhatsApp Digest</span>
+          </button>
+          <button 
+            onclick="exportJSON()" 
+            class="wood-btn px-3 py-2 rounded-lg bg-[#EDE2D2] hover:bg-[#E2D2BD] text-[#543E2B] text-xs font-bold border border-[#CCAFA0] transition"
+          >
+            JSON
+          </button>
+        </div>
+      </div>
+
+      <!-- Skim List Section (Carved Board Header) -->
+      <div class="wood-card rounded-2xl border-[#D8C5AB] overflow-hidden">
+        <div class="p-3 sm:p-4 bg-[#EDE3D3] border-b-2 border-[#D5C1A6] flex items-center justify-between">
+          <div>
+            <h3 class="font-black text-[#382618] text-xs sm:text-base">Warden's 60-Second Skim Board</h3>
+            <p class="text-[11px] text-[#7A5B42]">Sorted by life-safety & urgency priority</p>
+          </div>
+          <span id="displayCount" class="text-[11px] font-mono font-bold text-[#5C3F28] bg-[#DBC8B0] px-2 py-0.5 rounded-md">0 items</span>
+        </div>
+
+        <!-- Complaints List Container -->
+        <div id="complaintsList" class="divide-y divide-[#E8DAC6]">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Collapsible Pitch Notes (Wooden Accordion) -->
+    <details class="wood-card rounded-2xl p-4 border-[#D8C5AB] group">
+      <summary class="font-extrabold text-xs sm:text-sm text-[#382618] cursor-pointer flex items-center justify-between list-none">
+        <span class="flex items-center gap-1.5">
+          <span>🪵</span> <span>Hackathon Pitch Guide & Walkthrough</span>
+        </span>
+        <span class="text-[#7A5B42] group-open:rotate-180 transition-transform font-bold">&darr;</span>
+      </summary>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs text-[#5C4533] pt-3 mt-2 border-t border-[#E8DAC6]">
+        <div class="p-3 rounded-xl bg-[#F8F2E8] border border-[#DFCFBC]">
+          <p class="font-black text-[#382618] mb-1 flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-[#BC3815]"></span> 1. The Real Bottleneck
+          </p>
+          <p class="leading-relaxed">Student WhatsApp groups bury urgent sparks and sick students under trivial complaints. Wardens need an instant executive view.</p>
+        </div>
+        <div class="p-3 rounded-xl bg-[#F8F2E8] border border-[#DFCFBC]">
+          <p class="font-black text-[#382618] mb-1 flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-[#BD5D1B]"></span> 2. Local Gemma 4 Engine
+          </p>
+          <p class="leading-relaxed">100% on-device via Ollama. No private student data or room details leave the campus network, with zero cloud API bills.</p>
+        </div>
+        <div class="p-3 rounded-xl bg-[#F8F2E8] border border-[#DFCFBC]">
+          <p class="font-black text-[#382618] mb-1 flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-[#2D5A27]"></span> 3. From Chat to Action
+          </p>
+          <p class="leading-relaxed">Generates a formatted WhatsApp summary for maintenance teams in 1 click and auto-drafts replies to students missing room numbers.</p>
+        </div>
+      </div>
+    </details>
+
+  </main>
+
+  <!-- Woodish Footer -->
+  <footer class="bg-[#FBF6EE] border-t-2 border-[#D5C1A6] py-3 text-center text-[11px] text-[#7A5B42] px-4">
+    Built for Hackathon • Open Source Hostel Complaint Triage • Powered by Gemma 4 & Flask
+  </footer>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-6 sm:w-auto z-50 bg-[#3E2919] text-[#FDF8F0] text-xs font-bold px-4 py-3 rounded-xl shadow-2xl flex items-center justify-center sm:justify-start gap-2 transform translate-y-24 opacity-0 transition-all duration-300 pointer-events-none border border-[#6E4E32]">
+    <span id="toastIcon">✅</span>
+    <span id="toastMsg">Notification message</span>
+  </div>
+
+  <!-- Script Logic -->
+  <script>
+    let globalComplaints = [];
+    let currentFilter = 'all';
+    let samplePresets = {};
+
+    const CATEGORY_STYLES = {
+      "Electrical & Fire": { bg: "bg-[#FDF1E2]", text: "text-[#9E4506]", border: "border-[#FAD5A7]", icon: "⚡" },
+      "Plumbing & Water": { bg: "bg-[#EBF4FA]", text: "text-[#0C6399]", border: "border-[#B8DAED]", icon: "💧" },
+      "Medical & Safety": { bg: "bg-[#FDF0F2]", text: "text-[#B81D38]", border: "border-[#FCC2CB]", icon: "🏥" },
+      "Infrastructure & Lift": { bg: "bg-[#EFEAE2]", text: "text-[#5C4D3C]", border: "border-[#D8CABE]", icon: "🏗️" },
+      "Internet & IT": { bg: "bg-[#F1EEFB]", text: "text-[#5B21B6]", border: "border-[#DDD6FE]", icon: "📶" },
+      "Food & Mess": { bg: "bg-[#FEF7E6]", text: "text-[#926002]", border: "border-[#FDE6A5]", icon: "🍽️" },
+      "Discipline & Noise": { bg: "bg-[#F8EFFB]", text: "text-[#6E2B85]", border: "border-[#E4CCE9]", icon: "📢" },
+      "Cleanliness & Pest": { bg: "bg-[#EEF7EE]", text: "text-[#28632B]", border: "border-[#C2E3C4]", icon: "🌿" },
+      "Other": { bg: "bg-[#EFECE8]", text: "text-[#6B5E51]", border: "border-[#D9CFC4]", icon: "🏷️" }
+    };
+
+    async function initPresets() {
+      try {
+        const res = await fetch('/api/presets');
+        const data = await res.json();
+        (data.presets || []).forEach(p => {
+          samplePresets[p.id] = p.raw_text;
+        });
+      } catch (err) {
+        console.error("Presets load error:", err);
+      }
+    }
+    initPresets();
+
+    function loadPreset(presetId) {
+      if (samplePresets[presetId]) {
+        document.getElementById('chatDumpInput').value = samplePresets[presetId];
+        showToast("Loaded sample scenario!", "📋");
+      }
+    }
+
+    function clearInput() {
+      document.getElementById('chatDumpInput').value = '';
+      document.getElementById('resultsSection').classList.add('hidden');
+    }
+
+    function showToast(msg, icon = "✅") {
+      const toast = document.getElementById('toast');
+      document.getElementById('toastMsg').textContent = msg;
+      document.getElementById('toastIcon').textContent = icon;
+      toast.classList.remove('translate-y-24', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+      setTimeout(() => {
+        toast.classList.add('translate-y-24', 'opacity-0');
+        toast.classList.remove('translate-y-0', 'opacity-100');
+      }, 3000);
+    }
+
+    async function runTriage() {
+      const chatDump = document.getElementById('chatDumpInput').value.trim();
+      if (!chatDump) {
+        showToast("Please paste or load a chat dump first!", "⚠️");
+        return;
+      }
+
+      const btn = document.getElementById('triageBtn');
+      const btnText = document.getElementById('btnText');
+      const btnIcon = document.getElementById('btnIcon');
+
+      btn.disabled = true;
+      btn.classList.add('opacity-75', 'cursor-not-allowed');
+      btnText.textContent = "Gemma 4 Triaging...";
+      btnIcon.innerHTML = `<svg class="animate-spin h-4 w-4 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>`;
+
+      try {
+        const startTime = Date.now();
+        const response = await fetch('/api/triage', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ chat_dump: chatDump })
+        });
+        const data = await response.json();
+        const duration = ((Date.now() - startTime) / 1000).toFixed(1);
+
+        if (!data.success) {
+          showToast(data.error || "Triage failed", "❌");
+          return;
+        }
+
+        globalComplaints = data.complaints || [];
+        renderMetrics(data.metrics);
+        renderComplaintsList();
+        document.getElementById('resultsSection').classList.remove('hidden');
+        showToast(`Triaged ${globalComplaints.length} complaints in ${duration}s!`, "⚡");
+
+        document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth' });
+
+      } catch (err) {
+        showToast("Error: " + err.message, "❌");
+      } finally {
+        btn.disabled = false;
+        btn.classList.remove('opacity-75', 'cursor-not-allowed');
+        btnText.textContent = "Triage Complaints with Gemma 4";
+        btnIcon.textContent = "⚡";
+      }
+    }
+
+    function renderMetrics(metrics) {
+      if (!metrics) return;
+      document.getElementById('metricTotal').textContent = metrics.total || 0;
+      document.getElementById('metricCritical').textContent = metrics.critical || 0;
+      document.getElementById('metricHigh').textContent = metrics.high || 0;
+      document.getElementById('metricMedLow').textContent = (metrics.medium || 0) + (metrics.low || 0);
+      document.getElementById('metricMissing').textContent = metrics.missing_room || 0;
+    }
+
+    function setFilter(filter) {
+      currentFilter = filter;
+      document.querySelectorAll('.filter-pill').forEach(btn => {
+        btn.classList.remove('bg-[#3E2919]', 'text-[#FDF8F0]');
+      });
+      event.target.classList.add('bg-[#3E2919]', 'text-[#FDF8F0]');
+      renderComplaintsList();
+    }
+
+    function renderComplaintsList() {
+      const container = document.getElementById('complaintsList');
+      container.innerHTML = '';
+
+      let filtered = globalComplaints;
+      if (currentFilter === 'Critical') {
+        filtered = globalComplaints.filter(c => c.urgency === 'Critical');
+      } else if (currentFilter === 'High') {
+        filtered = globalComplaints.filter(c => c.urgency === 'High');
+      } else if (currentFilter === 'missing') {
+        filtered = globalComplaints.filter(c => c.has_missing_room);
+      }
+
+      document.getElementById('displayCount').textContent = `${filtered.length} of ${globalComplaints.length}`;
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="p-6 text-center text-[#7A5B42] text-xs">
+            No complaints found matching filter "${currentFilter}".
+          </div>
+        `;
+        return;
+      }
+
+      filtered.forEach(c => {
+        const isCritical = c.urgency === 'Critical';
+        const isHigh = c.urgency === 'High';
+        const isMedium = c.urgency === 'Medium';
+
+        let urgencyBadge = '';
+        let rowAccent = 'border-l-4 border-[#C9B29B] bg-white';
+        if (isCritical) {
+          urgencyBadge = `<span class="text-[10px] font-black px-2 py-0.5 rounded-full bg-[#FDF0EB] text-[#A63012] border border-[#F6C9BA]">🚨 CRITICAL</span>`;
+          rowAccent = 'border-l-4 border-[#BC3815] bg-[#FFFDFC]';
+        } else if (isHigh) {
+          urgencyBadge = `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#FDF4EB] text-[#A04D14] border border-[#F8D4B4]">⚠️ HIGH</span>`;
+          rowAccent = 'border-l-4 border-[#BD5D1B] bg-[#FFFDF9]';
+        } else if (isMedium) {
+          urgencyBadge = `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#FEF7E6] text-[#8C5D02] border border-[#FDE5A1]">🟡 MED</span>`;
+          rowAccent = 'border-l-4 border-[#D97706] bg-[#FFFDF9]';
+        } else {
+          urgencyBadge = `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#EEF7EE] text-[#28632B] border border-[#C2E3C4]">🟢 LOW</span>`;
+          rowAccent = 'border-l-4 border-[#467E3A] bg-[#FFFDF9]';
+        }
+
+        const catStyle = CATEGORY_STYLES[c.category] || CATEGORY_STYLES["Other"];
+
+        const roomBadge = c.has_missing_room 
+          ? `<span class="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded bg-[#F5F0F8] text-[#6B3E8E] border border-[#DFCEEC]">⚠️ Missing Room</span>`
+          : `<span class="inline-flex items-center gap-1 text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-[#ECE0D0] text-[#382618] border border-[#CDB9A0]">📍 ${escapeHtml(c.room)}</span>`;
+
+        const item = document.createElement('div');
+        item.className = `p-3.5 sm:p-5 transition hover:bg-[#F9F4EB] ${rowAccent}`;
+        item.innerHTML = `
+          <div class="space-y-2">
+            <!-- Badges Row -->
+            <div class="flex flex-wrap items-center gap-1.5">
+              ${urgencyBadge}
+              ${roomBadge}
+              <span class="inline-flex items-center gap-1 text-[10px] font-bold px-1.5 py-0.5 rounded ${catStyle.bg} ${catStyle.text} border ${catStyle.border}">
+                <span>${catStyle.icon}</span> ${escapeHtml(c.category)}
+              </span>
+            </div>
+
+            <!-- One Line Summary -->
+            <h4 class="text-xs sm:text-sm font-black text-[#382618] leading-snug pt-0.5">
+              ${escapeHtml(c.one_line_summary)}
+            </h4>
+
+            <!-- Reason -->
+            <p class="text-[11px] text-[#5C4533]">
+              <span class="font-bold text-[#382618]">Reason:</span> ${escapeHtml(c.urgency_reason)}
+            </p>
+
+            <!-- Action Box (Warm Wood Inlay) -->
+            <div class="bg-[#ECE0D0] border border-[#CDB9A0] rounded-lg p-2 flex items-start gap-1.5">
+              <span class="text-[#BC3815] text-[11px] font-black shrink-0">👉 Action:</span>
+              <span class="text-[11px] font-bold text-[#382618]">${escapeHtml(c.action_required)}</span>
+            </div>
+
+            <!-- Action Buttons for Mobile -->
+            <div class="flex items-center justify-between pt-1 gap-2">
+              <button onclick="copyStudentReply(${c.id})" class="wood-btn text-[11px] bg-white hover:bg-[#F9F4EB] text-[#382618] border border-[#CDB9A0] px-2.5 py-1.5 rounded-lg font-bold transition flex items-center gap-1 shadow-xs">
+                💬 Copy Student Reply
+              </button>
+              <button onclick="toggleRaw(${c.id})" class="text-[11px] text-[#7A5B42] hover:text-[#382618] underline font-semibold">
+                View Raw Chat
+              </button>
+            </div>
+
+            <!-- Collapsible Raw Chat -->
+            <div id="rawSnippet-${c.id}" class="hidden mt-2 pt-2 border-t border-[#D8C5AB] text-[11px] font-mono text-[#5C4533] bg-[#F9F4EB] p-2 rounded-lg border border-[#CDB9A0]">
+              <span class="font-bold text-[#382618] block mb-0.5">Original Student Text:</span>
+              "${escapeHtml(c.student_raw)}"
+            </div>
+          </div>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    function toggleRaw(id) {
+      const el = document.getElementById(`rawSnippet-${id}`);
+      if (el) el.classList.toggle('hidden');
+    }
+
+    function copyStudentReply(id) {
+      const item = globalComplaints.find(c => c.id === id);
+      if (item && item.suggested_reply) {
+        navigator.clipboard.writeText(item.suggested_reply);
+        showToast("Copied reply message!", "💬");
+      }
+    }
+
+    async function copyWhatsAppDigest() {
+      if (!globalComplaints || globalComplaints.length === 0) {
+        showToast("No complaints to format", "⚠️");
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/format_whatsapp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ complaints: globalComplaints })
+        });
+        const data = await res.json();
+        if (data.formatted_text) {
+          await navigator.clipboard.writeText(data.formatted_text);
+          showToast("Copied WhatsApp Action Digest!", "📲");
+        }
+      } catch (err) {
+        showToast("Error generating digest", "❌");
+      }
+    }
+
+    function exportJSON() {
+      if (!globalComplaints || globalComplaints.length === 0) return;
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(globalComplaints, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `hostel_triage_${new Date().toISOString().slice(0,10)}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+      showToast("Downloaded JSON!", "📥");
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+  </script>
+</body>
+</html>
