@@ -171,6 +171,29 @@ flowchart TD
     - Built dedicated backend endpoint `/api/dispatch_audio` that renders genuine 16-bit 22050Hz uncompressed `.wav` audio using native high-fidelity voices (Samantha / Daniel).
     - Frontend automatically streams the server's real `.wav` file through HTML5 `<audio>`, bypassing all browser Web Speech API blocking, permission limits, and audio driver queue locks.
     - Added seamless client-side Web Speech fallback with `resume()` for cloud/Vercel serverless deployments.
+- [x] **Step 10: Left Sidebar Category Navigation & Multi-View Operations Suite**
+  - [x] **🧭 Left-Side Category Navigation Bar:**
+    - Placed prominently on the **left side** as a persistent dark sidebar on desktop (`w-64` / `w-72`) with sleek mobile header drawer.
+    - Features the exact categories requested:
+      - `← Home` (Main triage radar, Kanban, skim board, raw input)
+      - `🚨 Simulator` (Interactive crisis drills & disaster countdown)
+      - `🛡️ Rails` (Deterministic life-safety override, injection firewall, PII redaction)
+      - `⚡ Commands` (Walkie-talkie radio dispatch, WhatsApp alert generator, speed-dial)
+      - `📜 ToS` (University regulations, SLA matrices, emergency room entry protocols)
+      - `🔒 Privacy` (100% on-premise Gemma 4 sovereign air-gap audit)
+    - Active category highlighted with luminous neon green indicator (`#22C55E` with `shadow-[0_0_12px_#22c55e]`) and high-contrast typography matching the uploaded design reference.
+  - [x] **🚨 Crisis Drill Simulator View (`#view-simulator`):**
+    - 4 Interactive crisis drills: Monsoon Hydro-Electrical Surge, LPG Mess Flare, Night Boundary Security Breach, and Potable Water Outbreak.
+    - Real-time incident event stream terminal, emergency 15:00 countdown clock, automated breaker lockout simulation, and 1-click drill injection into the live triage engine.
+  - [x] **🛡️ AI Safety Rails & Guardrail Policies View (`#view-rails`):**
+    - Interactive guardrail playground evaluating inputs against deterministic regex life-safety override, adversarial prompt injection scores, strict SLA tiers, and PII masking.
+  - [x] **⚡ Tactical Commands & Radio Dispatch Hub (`#view-commands`):**
+    - Multi-channel walkie-talkie station (CH 1 to 5) with custom voice transmission using Samantha 22kHz `.wav` synthesis.
+    - 1-click hostel WhatsApp broadcast bulletin generator and campus emergency speed-dial hotline matrix.
+  - [x] **📜 Terms of Service & Protocols View (`#view-tos`):**
+    - Comprehensive hostel incident bylaws: misuse fines (₹5,000), SLA table, nocturnal quiet hours dispatch, and warden emergency room entry rights.
+  - [x] **🔒 Campus Data Fortress & Sovereign Privacy View (`#view-privacy`):**
+    - Air-gap validation console, 127.0.0.1 loopback confirmation, zero cloud egress telemetry proof, and FERPA / DPDP Act 2023 compliance.
 
 ---
 
