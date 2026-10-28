@@ -202,13 +202,19 @@ def triage_hostel_chat(
                 if m_resp.ok:
                     available = [m["id"] for m in m_resp.json().get("data", [])]
                     logger.info(f"Available Groq models: {available}")
-                    if groq_model not in available:
-                        candidates = [m for m in available if any(k in m.lower() for k in ["llama", "mixtral", "qwen"])]
-                        if candidates:
-                            groq_model = candidates[0]
-                        elif available:
-                            groq_model = available[0]
-                        logger.info(f"Auto-selected active model: {groq_model}")
+                    # Filter for real generative text/chat models (exclude guardrails/whisper audio/speech)
+                    chat_models = [m for m in available if not any(k in m.lower() for k in ["guard", "whisper", "orpheus", "speech"])]
+                    
+                    if groq_model not in chat_models:
+                        # Pick top preferred chat models supported on this Groq account
+                        preferred = ["openai/gpt-oss-120b", "openai/gpt-oss-20b", "qwen/qwen3.8-27b", "allam-2-7b"]
+                        for p in preferred:
+                            if p in chat_models:
+                                groq_model = p
+                                break
+                        else:
+                            groq_model = chat_models[0] if chat_models else "openai/gpt-oss-120b"
+                        logger.info(f"Auto-selected active chat model: {groq_model}")
             except Exception as ex:
                 logger.warning(f"Could not auto-fetch models: {ex}")
 
