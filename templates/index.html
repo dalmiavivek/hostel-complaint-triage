@@ -183,7 +183,7 @@
         <span class="text-[10px] sm:text-xs text-[#87664B] font-medium">Click to load live chaotic dumps</span>
       </div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
         <button onclick="loadPreset('monsoon_storm')" class="wood-btn text-xs bg-[#EBF0F6] hover:bg-[#D9E4EF] text-[#1B4B84] border border-[#B7CEE5] px-3 py-2 rounded-lg font-bold flex items-center justify-center sm:justify-start gap-1.5 shadow-xs">
           <span>🌧️</span> <span class="truncate">Monsoon Storm & Sparks</span>
         </button>
@@ -192,6 +192,9 @@
         </button>
         <button onclick="loadPreset('daily_mix')" class="wood-btn text-xs bg-[#EDE2D2] hover:bg-[#E2D2BD] text-[#543E2B] border border-[#D1BEA8] px-3 py-2 rounded-lg font-bold flex items-center justify-center sm:justify-start gap-1.5 shadow-xs">
           <span>☕</span> <span class="truncate">Daily Mixed Chatter</span>
+        </button>
+        <button onclick="loadPreset('whatsapp_export')" class="wood-btn text-xs bg-[#E8F8EE] hover:bg-[#D2F0DC] text-[#128C7E] border border-[#A6E4BC] px-3 py-2 rounded-lg font-bold flex items-center justify-center sm:justify-start gap-1.5 shadow-xs">
+          <span>📥</span> <span class="truncate">WhatsApp Group Export</span>
         </button>
       </div>
     </div>
@@ -207,9 +210,19 @@
             Paste unedited WhatsApp/Telegram messages below:
           </p>
         </div>
-        <button onclick="clearInput()" class="text-xs font-bold text-[#7A5B42] hover:text-[#BC3815] px-2.5 py-1 rounded bg-[#E8D9C5] border border-[#CFBBA2] shrink-0">
-          Clear Text
-        </button>
+        <div class="flex items-center gap-2">
+          <!-- WhatsApp Import Feature Button -->
+          <button 
+            onclick="openWhatsAppModal()" 
+            class="wood-btn text-xs font-black bg-[#25D366] hover:bg-[#1EBE5D] text-white px-3 py-1.5 rounded-lg shadow-xs flex items-center gap-1.5 transition border border-[#1DA851]"
+            title="Import exported WhatsApp chat (.txt) or paste raw WhatsApp logs"
+          >
+            <span>📥</span> Import WhatsApp Chat
+          </button>
+          <button onclick="clearInput()" class="text-xs font-bold text-[#7A5B42] hover:text-[#BC3815] px-2.5 py-1.5 rounded-lg bg-[#E8D9C5] border border-[#CFBBA2] shrink-0 transition">
+            Clear
+          </button>
+        </div>
       </div>
 
       <textarea 
@@ -338,6 +351,9 @@
             <button onclick="setFilter('all')" class="filter-pill active px-2.5 py-1 rounded-full text-xs font-bold bg-[#3E2919] text-[#FDF8F0] transition shrink-0">All</button>
             <button onclick="setFilter('Critical')" class="filter-pill px-2.5 py-1 rounded-full text-xs font-bold bg-[#FDF0EB] text-[#A63012] border border-[#F6C9BA] hover:bg-[#FBE4DD] transition shrink-0">🔴 Critical</button>
             <button onclick="setFilter('High')" class="filter-pill px-2.5 py-1 rounded-full text-xs font-bold bg-[#FDF4EB] text-[#A04D14] border border-[#F8D4B4] hover:bg-[#FBE9D6] transition shrink-0">🟠 High</button>
+            <button onclick="setFilter('Night Safety & Security')" class="filter-pill px-2.5 py-1 rounded-full text-xs font-bold bg-[#F1F5F9] text-[#334155] border border-[#CBD5E1] hover:bg-[#E2E8F0] transition shrink-0">🛡️ Security</button>
+            <button onclick="setFilter('Gas Leak & Biohazard')" class="filter-pill px-2.5 py-1 rounded-full text-xs font-bold bg-[#FEF2F2] text-[#991B1B] border border-[#FECACA] hover:bg-[#FEE2E2] transition shrink-0">🧪 Gas/Bio</button>
+            <button onclick="setFilter('Drinking Water & Hygiene')" class="filter-pill px-2.5 py-1 rounded-full text-xs font-bold bg-[#F0F9FF] text-[#0369A1] border border-[#BAE6FD] hover:bg-[#E0F2FE] transition shrink-0">🚰 Potable Water</button>
             <button onclick="setFilter('missing')" class="filter-pill px-2.5 py-1 rounded-full text-xs font-bold bg-[#F5F0F8] text-[#6B3E8E] border border-[#DFCEEC] hover:bg-[#EFE5F6] transition shrink-0">❓ No Room</button>
           </div>
 
@@ -410,19 +426,105 @@
 
       </div>
 
-      <!-- Skim List Section -->
+      <!-- Skim Board & Interactive Kanban Section -->
       <div class="wood-card rounded-2xl border-[#D8C5AB] overflow-hidden">
-        <div class="p-3 sm:p-4 bg-[#EDE3D3] border-b-2 border-[#D5C1A6] flex items-center justify-between">
+        <div class="p-3 sm:p-4 bg-[#EDE3D3] border-b-2 border-[#D5C1A6] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h3 class="font-black text-[#382618] text-xs sm:text-base">Warden's 60-Second Skim Board</h3>
+            <h3 class="font-black text-[#382618] text-xs sm:text-base flex items-center gap-2">
+              <span>📋</span> <span>Warden's 60-Second Skim Board</span>
+            </h3>
             <p class="text-[11px] text-[#7A5B42]">Sorted by hazard severity with live SLA countdowns</p>
           </div>
-          <span id="displayCount" class="text-[11px] font-mono font-bold text-[#5C3F28] bg-[#DBC8B0] px-2 py-0.5 rounded-md">0 items</span>
+
+          <!-- Dual View Switcher (Skim List vs Kanban Board) -->
+          <div class="flex items-center gap-2">
+            <div class="flex items-center gap-1 bg-[#DFCDB7] p-1 rounded-xl border border-[#CCAFA0] shadow-2xs">
+              <button 
+                id="viewListBtn" 
+                onclick="switchView('list')" 
+                class="px-3 py-1.5 rounded-lg text-xs font-black transition bg-[#3E2919] text-[#FDF8F0] shadow-sm flex items-center gap-1.5"
+              >
+                <span>📋</span> Skim List View
+              </button>
+              <button 
+                id="viewKanbanBtn" 
+                onclick="switchView('kanban')" 
+                class="px-3 py-1.5 rounded-lg text-xs font-black transition text-[#543E2B] hover:text-[#382618] flex items-center gap-1.5"
+              >
+                <span>📌</span> Kanban Board View
+              </button>
+            </div>
+            <span id="displayCount" class="text-[11px] font-mono font-bold text-[#5C3F28] bg-[#DBC8B0] px-2.5 py-1.5 rounded-lg border border-[#C5B095] shrink-0">0 items</span>
+          </div>
         </div>
 
-        <!-- Complaints List Container -->
-        <div id="complaintsList" class="divide-y divide-[#E8DAC6]">
-          <!-- Rendered dynamically -->
+        <!-- 1. Skim List Container (Default View) -->
+        <div id="skimListContainer">
+          <div id="complaintsList" class="divide-y divide-[#E8DAC6]">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+
+        <!-- 2. Interactive Kanban Board Container (3-Column Tactical Board) -->
+        <div id="kanbanBoardView" class="hidden p-3 sm:p-5 bg-[#F6EFE5] space-y-3">
+          <div class="flex items-center justify-between pb-1">
+            <p class="text-xs text-[#7A5B42]">
+              Drag cards between columns or use quick dispatch buttons. Real-time status syncs with SLA monitors.
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4">
+            <!-- Col 1: Not Yet Started -->
+            <div 
+              class="kanban-col bg-[#FDF9F2] border-2 border-[#D8C5AB] rounded-2xl p-3.5 flex flex-col min-h-[440px] transition-colors" 
+              ondragover="handleDragOver(event)" 
+              ondragleave="handleDragLeave(event)" 
+              ondrop="handleDrop(event, 'not_started')"
+            >
+              <div class="flex items-center justify-between pb-2.5 mb-2.5 border-b border-[#E2D2BD]">
+                <div class="flex items-center gap-2">
+                  <span class="w-2.5 h-2.5 rounded-full bg-[#BC3815]"></span>
+                  <h4 class="font-black text-xs text-[#382618] uppercase tracking-wider">Not Yet Started</h4>
+                </div>
+                <span id="kanbanCountNotStarted" class="text-[11px] font-black px-2 py-0.5 rounded-full bg-[#FDF0EB] text-[#BC3815] border border-[#F6C9BA]">0</span>
+              </div>
+              <div id="kanbanColNotStarted" class="space-y-3 flex-1 overflow-y-auto pr-0.5"></div>
+            </div>
+
+            <!-- Col 2: Under Process -->
+            <div 
+              class="kanban-col bg-[#FFFCF5] border-2 border-[#E5CA8F] rounded-2xl p-3.5 flex flex-col min-h-[440px] transition-colors" 
+              ondragover="handleDragOver(event)" 
+              ondragleave="handleDragLeave(event)" 
+              ondrop="handleDrop(event, 'under_process')"
+            >
+              <div class="flex items-center justify-between pb-2.5 mb-2.5 border-b border-[#E8D4A8]">
+                <div class="flex items-center gap-2">
+                  <span class="w-2.5 h-2.5 rounded-full bg-[#D97706] animate-pulse"></span>
+                  <h4 class="font-black text-xs text-[#382618] uppercase tracking-wider">Under Process</h4>
+                </div>
+                <span id="kanbanCountUnderProcess" class="text-[11px] font-black px-2 py-0.5 rounded-full bg-[#FEF7E6] text-[#D97706] border border-[#FDE6A5]">0</span>
+              </div>
+              <div id="kanbanColUnderProcess" class="space-y-3 flex-1 overflow-y-auto pr-0.5"></div>
+            </div>
+
+            <!-- Col 3: Task Completed -->
+            <div 
+              class="kanban-col bg-[#F4FAF3] border-2 border-[#B9DCBA] rounded-2xl p-3.5 flex flex-col min-h-[440px] transition-colors" 
+              ondragover="handleDragOver(event)" 
+              ondragleave="handleDragLeave(event)" 
+              ondrop="handleDrop(event, 'completed')"
+            >
+              <div class="flex items-center justify-between pb-2.5 mb-2.5 border-b border-[#C2E3C4]">
+                <div class="flex items-center gap-2">
+                  <span class="w-2.5 h-2.5 rounded-full bg-[#16A34A]"></span>
+                  <h4 class="font-black text-xs text-[#382618] uppercase tracking-wider">Task Completed</h4>
+                </div>
+                <span id="kanbanCountCompleted" class="text-[11px] font-black px-2 py-0.5 rounded-full bg-[#EEF7EE] text-[#16A34A] border border-[#C2E3C4]">0</span>
+              </div>
+              <div id="kanbanColCompleted" class="space-y-3 flex-1 overflow-y-auto pr-0.5"></div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -465,6 +567,54 @@
     Built for Hackathon • Open Source Hostel Complaint Triage • Powered by Gemma 4 & Flask
   </footer>
 
+  <!-- WhatsApp Chat Import Modal -->
+  <div id="whatsappModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-fade-in">
+    <div class="wood-card rounded-2xl max-w-lg w-full p-4 sm:p-6 border-2 border-[#8C5E37] bg-[#FDFBF7] shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-[#E2D2BD] pb-3">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg bg-[#25D366] text-white flex items-center justify-center font-bold text-lg">📲</div>
+          <div>
+            <h3 class="font-black text-sm text-[#382618]">Import WhatsApp Hostel Chat</h3>
+            <p class="text-[11px] text-[#7A5B42]">Auto-cleans timestamps, phone numbers, and WhatsApp headers</p>
+          </div>
+        </div>
+        <button onclick="closeWhatsAppModal()" class="w-7 h-7 rounded-full bg-[#EAE0D3] hover:bg-[#D5C1A6] text-[#5C4533] font-bold flex items-center justify-center transition">✕</button>
+      </div>
+
+      <!-- Option A: File Upload -->
+      <div class="space-y-2">
+        <label class="block text-xs font-black text-[#543E2B]">Option A: Upload WhatsApp Export File (.txt)</label>
+        <div class="border-2 border-dashed border-[#CCAFA0] rounded-xl p-4 text-center bg-[#F7F0E6] hover:bg-[#EFE5D8] transition cursor-pointer" onclick="document.getElementById('whatsappFileInput').click()">
+          <input type="file" id="whatsappFileInput" accept=".txt" class="hidden" onchange="handleWhatsAppFileUpload(event)">
+          <p class="text-xs font-bold text-[#382618]">📂 Click to select exported <span class="font-mono bg-white px-1 py-0.5 rounded border border-[#D5C1A6]">_chat.txt</span></p>
+          <p class="text-[10px] text-[#7A5B42] mt-0.5">Supports WhatsApp exported chats from iPhone, Android, and Desktop</p>
+        </div>
+      </div>
+
+      <!-- Option B: Direct Paste -->
+      <div class="space-y-1.5">
+        <label class="block text-xs font-black text-[#543E2B]">Option B: Paste Raw WhatsApp Messages</label>
+        <textarea id="whatsappPasteArea" rows="4" class="w-full rounded-xl border border-[#D4C1A8] bg-white p-3 font-mono text-xs text-[#382618] focus:border-[#25D366] focus:outline-none custom-scroll leading-relaxed" placeholder="Paste directly from WhatsApp chat:
+28/10/24, 9:18 PM - +91 98765 12345: 2 masked men jumped boundary near Wing A fire exit!
+28/10/24, 9:21 PM - Mess: LPG gas leak smell in kitchen corridor!
+28/10/24, 9:24 PM - Neha 208: 2nd floor drinking water is yellow and foul smelling..."></textarea>
+      </div>
+
+      <!-- Modal Footer Actions -->
+      <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 pt-2 border-t border-[#E2D2BD]">
+        <button onclick="loadWhatsAppDemoPreset()" class="text-xs font-bold text-[#0D6292] hover:underline flex items-center gap-1 justify-center sm:justify-start">
+          <span>✨</span> Load Sample WhatsApp Export
+        </button>
+        <div class="flex items-center gap-2">
+          <button onclick="closeWhatsAppModal()" class="px-3 py-2 rounded-lg text-xs font-bold bg-[#E8DAC6] text-[#543E2B] hover:bg-[#DBCABA] transition">Cancel</button>
+          <button onclick="processWhatsAppImport()" class="px-4 py-2 rounded-lg text-xs font-black bg-[#25D366] hover:bg-[#1EBE5D] text-white shadow-xs transition flex items-center gap-1.5">
+            <span>📥</span> Clean & Import
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast Notification -->
   <div id="toast" class="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-6 sm:w-auto z-50 bg-[#3E2919] text-[#FDF8F0] text-xs font-bold px-4 py-3 rounded-xl shadow-2xl flex items-center justify-center sm:justify-start gap-2 transform translate-y-24 opacity-0 transition-all duration-300 pointer-events-none border border-[#6E4E32]">
     <span id="toastIcon">✅</span>
@@ -479,10 +629,16 @@
     let samplePresets = {};
     let resolvedMap = {};
 
+    let taskStatusMap = {};
+    let currentView = 'list';
+
     const CATEGORY_STYLES = {
       "Electrical & Fire": { bg: "bg-[#FDF1E2]", text: "text-[#9E4506]", border: "border-[#FAD5A7]", icon: "⚡" },
       "Plumbing & Water": { bg: "bg-[#EBF4FA]", text: "text-[#0C6399]", border: "border-[#B8DAED]", icon: "💧" },
       "Medical & Safety": { bg: "bg-[#FDF0F2]", text: "text-[#B81D38]", border: "border-[#FCC2CB]", icon: "🏥" },
+      "Night Safety & Security": { bg: "bg-[#ECEFF4]", text: "text-[#1E293B]", border: "border-[#CBD5E1]", icon: "🛡️" },
+      "Gas Leak & Biohazard": { bg: "bg-[#FEF2F2]", text: "text-[#991B1B]", border: "border-[#FECACA]", icon: "🧪" },
+      "Drinking Water & Hygiene": { bg: "bg-[#E0F2FE]", text: "text-[#0369A1]", border: "border-[#BAE6FD]", icon: "🚰" },
       "Infrastructure & Lift": { bg: "bg-[#EFEAE2]", text: "text-[#5C4D3C]", border: "border-[#D8CABE]", icon: "🏗️" },
       "Internet & IT": { bg: "bg-[#F1EEFB]", text: "text-[#5B21B6]", border: "border-[#DDD6FE]", icon: "📶" },
       "Food & Mess": { bg: "bg-[#FEF7E6]", text: "text-[#926002]", border: "border-[#FDE6A5]", icon: "🍽️" },
@@ -494,10 +650,10 @@
     // Pre-defined spatial floor blueprint of the hostel
     const HOSTEL_RADAR_MAP = [
       { floor: "4th Floor", rooms: ["401", "402", "404", "B-412", "4th Floor Washroom"] },
-      { floor: "3rd Floor", rooms: ["301", "304", "312", "314", "3rd Floor Drying"] },
-      { floor: "2nd Floor", rooms: ["201", "B-204", "208", "215", "Wing C Water Dispenser"] },
-      { floor: "1st Floor", rooms: ["101", "102", "104", "108", "118", "Wing A Wi-Fi"] },
-      { floor: "Ground / Common", rooms: ["Ground Washroom", "Mess Hall", "Wing C Terrace", "Lift 2"] }
+      { floor: "3rd Floor", rooms: ["301", "304", "312", "314", "315", "3rd Floor Drying"] },
+      { floor: "2nd Floor", rooms: ["201", "B-204", "208", "215", "Wing C Water Dispenser", "Women's Biometric"] },
+      { floor: "1st Floor", rooms: ["101", "102", "104", "B-104", "108", "118", "Wing A Wi-Fi"] },
+      { floor: "Ground / Common", rooms: ["G-04", "Ground Washroom", "Mess Hall", "Mess Kitchen", "Wing A Fire Exit", "Wing C Terrace", "Lift 2"] }
     ];
 
     async function initPresets() {
@@ -571,10 +727,17 @@
         globalComplaints = data.complaints || [];
         globalCascading = data.cascading_risks || [];
         
+        // Initialize Kanban task statuses (default: not_started)
+        taskStatusMap = {};
+        globalComplaints.forEach(c => {
+          taskStatusMap[c.id] = resolvedMap[c.id] ? 'completed' : 'not_started';
+        });
+
         renderMetrics(data.metrics);
         renderCascadingAlert(globalCascading);
         renderSpatialRadar();
         renderComplaintsList();
+        renderKanbanBoard();
         
         document.getElementById('resultsSection').classList.remove('hidden');
         showToast(`Triaged ${globalComplaints.length} issues in ${duration}s!`, "⚡");
@@ -928,12 +1091,19 @@
     }
 
     window.activeSpeechUtterance = null;
+    window.activeAudioPlayer = null;
 
     function stopWalkieTalkieDispatch() {
+      if (window.activeAudioPlayer) {
+        try {
+          window.activeAudioPlayer.pause();
+          window.activeAudioPlayer.currentTime = 0;
+        } catch (e) {}
+        window.activeAudioPlayer = null;
+      }
       if ('speechSynthesis' in window) {
         try {
           window.speechSynthesis.cancel();
-          window.speechSynthesis.resume();
         } catch (e) {}
       }
       playSquelchTail();
@@ -957,9 +1127,53 @@
       }
     }
 
+    // Direct Google Cloud TTS HTML5 Audio Fallback Player
+    function playAudioDispatchFallback(scriptText) {
+      if (window.activeAudioPlayer) return;
+      try {
+        // Shorten to crisp 160-char punchy radio snippet for reliable audio streaming
+        let snippet = scriptText;
+        if (snippet.length > 175) {
+          snippet = snippet.substring(0, 175).trim() + "... Over and out.";
+        }
+        const audioUrl = `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=en&q=${encodeURIComponent(snippet)}`;
+        const audio = new Audio(audioUrl);
+        window.activeAudioPlayer = audio;
+
+        audio.onplay = () => {
+          const anim = document.getElementById('soundwaveAnim');
+          if (anim) {
+            anim.classList.remove('hidden');
+            anim.classList.add('flex');
+          }
+        };
+
+        audio.onended = () => {
+          playSquelchTail();
+          resetWalkieUI();
+          window.activeAudioPlayer = null;
+          showToast("Walkie-Talkie audio dispatch broadcast complete!", "🎙️");
+        };
+
+        audio.onerror = (e) => {
+          console.warn("Audio fallback error:", e);
+          resetWalkieUI();
+          window.activeAudioPlayer = null;
+        };
+
+        audio.play().catch(err => {
+          console.warn("Audio play() blocked:", err);
+          resetWalkieUI();
+        });
+      } catch (err) {
+        console.warn("Could not play fallback audio:", err);
+        resetWalkieUI();
+      }
+    }
+
     function playWalkieTalkieDispatch() {
-      // 1. If currently speaking or queued, clicking acts as PTT release/stop
-      if ('speechSynthesis' in window && (window.speechSynthesis.speaking || window.speechSynthesis.pending)) {
+      // 1. If currently speaking or audio player is active, clicking acts as PTT release/stop
+      if (window.activeAudioPlayer || ('speechSynthesis' in window && (window.speechSynthesis.speaking || window.speechSynthesis.pending))) {
         stopWalkieTalkieDispatch();
         showToast("Walkie-Talkie transmission stopped", "⏹️");
         return;
@@ -979,38 +1193,7 @@
 
       if (!scriptText) return;
 
-      if (!('speechSynthesis' in window)) {
-        showToast("Speech synthesis not supported on this browser", "⚠️");
-        return;
-      }
-
-      // 4. Reset speech synthesis engine out of any frozen/paused state
-      try {
-        window.speechSynthesis.cancel();
-        window.speechSynthesis.resume();
-      } catch (e) {}
-
-      // 5. Select natural human voice
-      const voice = getSelectedVoice();
-
-      // 6. Instantiate utterance and store globally so V8 doesn't garbage collect it
-      const utterance = new SpeechSynthesisUtterance(scriptText);
-      window.activeSpeechUtterance = utterance;
-
-      if (voice) {
-        try {
-          utterance.voice = voice;
-          utterance.lang = voice.lang || 'en-US';
-        } catch (e) {}
-      } else {
-        utterance.lang = 'en-US';
-      }
-
-      utterance.rate = 0.98;
-      utterance.pitch = 1.0;
-      utterance.volume = 1.0;
-
-      // 7. Update UI elements
+      // 4. Update UI elements immediately
       const anim = document.getElementById('soundwaveAnim');
       const btnText = document.getElementById('walkieText');
       const banner = document.getElementById('liveDispatchBanner');
@@ -1025,46 +1208,365 @@
         btnText.textContent = "Broadcasting (Click to Stop)";
       }
       if (voiceBadge) {
-        const vName = voice ? voice.name.split(' ')[0] : 'Natural';
-        voiceBadge.textContent = `${vName} Voice`;
+        voiceBadge.textContent = "Human Dispatcher";
       }
       if (banner && bannerText) {
         bannerText.textContent = `"${scriptText}"`;
         banner.classList.remove('hidden');
       }
 
-      utterance.onend = () => {
-        playSquelchTail();
-        resetWalkieUI();
-        window.activeSpeechUtterance = null;
-        showToast("Walkie-Talkie dispatch broadcast complete!", "🎙️");
-      };
+      // 5. Dual-engine Audio Execution:
+      // Try Browser Web Speech API first without cancel() collision, backed up by HTML5 Audio!
+      let speechStarted = false;
 
-      utterance.onerror = (e) => {
-        console.warn("SpeechSynthesis utterance error:", e);
-        // Robust fallback: if selected voice errored, immediately speak with system default voice
-        if (utterance.voice) {
-          try {
-            const fallback = new SpeechSynthesisUtterance(scriptText);
-            fallback.lang = 'en-US';
-            fallback.rate = 1.0;
-            fallback.volume = 1.0;
-            window.activeSpeechUtterance = fallback;
-            fallback.onend = () => {
-              playSquelchTail();
+      if ('speechSynthesis' in window) {
+        try {
+          const utterance = new SpeechSynthesisUtterance(scriptText);
+          window.activeSpeechUtterance = utterance;
+
+          const chosenVoice = getSelectedVoice();
+          // Only assign voice if user explicitly picked one, else let browser use default working voice
+          const select = document.getElementById('walkieVoiceSelect');
+          if (select && select.value !== 'auto' && chosenVoice) {
+            utterance.voice = chosenVoice;
+          }
+          utterance.lang = 'en-US';
+          utterance.rate = 0.98;
+          utterance.pitch = 1.0;
+          utterance.volume = 1.0;
+
+          utterance.onstart = () => {
+            speechStarted = true;
+          };
+
+          utterance.onend = () => {
+            playSquelchTail();
+            resetWalkieUI();
+            window.activeSpeechUtterance = null;
+            showToast("Walkie-Talkie dispatch broadcast complete!", "🎙️");
+          };
+
+          utterance.onerror = (e) => {
+            console.warn("SpeechSynthesis error, triggering audio stream fallback:", e);
+            if (!speechStarted) {
+              playAudioDispatchFallback(scriptText);
+            } else {
               resetWalkieUI();
-              window.activeSpeechUtterance = null;
-            };
-            window.speechSynthesis.speak(fallback);
-            return;
-          } catch (err) {}
-        }
-        resetWalkieUI();
-        window.activeSpeechUtterance = null;
-      };
+            }
+          };
 
-      // 8. SYNCHRONOUS execution in click handler ensures user gesture is valid in all browsers!
-      window.speechSynthesis.speak(utterance);
+          window.speechSynthesis.speak(utterance);
+
+          // Watchdog: If browser SpeechSynthesis was silently blocked or hung, trigger HTML5 Audio after 300ms
+          setTimeout(() => {
+            if (!speechStarted && !window.speechSynthesis.speaking) {
+              console.warn("Web Speech API did not produce sound. Triggering HTML5 Audio Dispatch Fallback...");
+              playAudioDispatchFallback(scriptText);
+            }
+          }, 300);
+
+          return;
+        } catch (e) {
+          console.warn("Web Speech initialization failed, using HTML5 Audio fallback:", e);
+        }
+      }
+
+      // If SpeechSynthesis not supported or failed to init, play HTML5 Audio directly
+      playAudioDispatchFallback(scriptText);
+    }
+
+    // ==========================================
+    // KANBAN BOARD & VIEW SWITCHER ENGINE
+    // ==========================================
+    function switchView(view) {
+      currentView = view;
+      const listEl = document.getElementById('skimListContainer');
+      const kanbanEl = document.getElementById('kanbanBoardView');
+      const listBtn = document.getElementById('viewListBtn');
+      const kanbanBtn = document.getElementById('viewKanbanBtn');
+
+      if (view === 'list') {
+        if (listEl) listEl.classList.remove('hidden');
+        if (kanbanEl) kanbanEl.classList.add('hidden');
+        if (listBtn) {
+          listBtn.className = "px-3 py-1.5 rounded-lg text-xs font-black transition bg-[#3E2919] text-[#FDF8F0] shadow-sm flex items-center gap-1.5";
+        }
+        if (kanbanBtn) {
+          kanbanBtn.className = "px-3 py-1.5 rounded-lg text-xs font-black transition text-[#543E2B] hover:text-[#382618] flex items-center gap-1.5";
+        }
+        renderComplaintsList();
+      } else {
+        if (listEl) listEl.classList.add('hidden');
+        if (kanbanEl) kanbanEl.classList.remove('hidden');
+        if (kanbanBtn) {
+          kanbanBtn.className = "px-3 py-1.5 rounded-lg text-xs font-black transition bg-[#3E2919] text-[#FDF8F0] shadow-sm flex items-center gap-1.5";
+        }
+        if (listBtn) {
+          listBtn.className = "px-3 py-1.5 rounded-lg text-xs font-black transition text-[#543E2B] hover:text-[#382618] flex items-center gap-1.5";
+        }
+        renderKanbanBoard();
+      }
+    }
+
+    function moveTask(id, targetStatus) {
+      taskStatusMap[id] = targetStatus;
+      if (targetStatus === 'completed') {
+        resolvedMap[id] = true;
+      } else {
+        delete resolvedMap[id];
+      }
+      renderComplaintsList();
+      renderKanbanBoard();
+      updateKanbanCounters();
+
+      const c = globalComplaints.find(item => item.id === id);
+      const roomText = c ? c.room : `Task #${id}`;
+      if (targetStatus === 'under_process') {
+        showToast(`Dispatched ground crew to Room ${roomText}!`, "🟡");
+      } else if (targetStatus === 'completed') {
+        showToast(`Task for Room ${roomText} marked resolved & closed!`, "✅");
+      } else {
+        showToast(`Task for Room ${roomText} returned to Not Started`, "↩️");
+      }
+    }
+
+    function handleDragStart(ev, id) {
+      ev.dataTransfer.setData("text/plain", id);
+      ev.currentTarget.classList.add('opacity-40');
+    }
+
+    function handleDragEnd(ev) {
+      ev.currentTarget.classList.remove('opacity-40');
+    }
+
+    function handleDragOver(ev) {
+      ev.preventDefault();
+      ev.currentTarget.classList.add('bg-amber-100/50', 'border-[#8C5E37]');
+    }
+
+    function handleDragLeave(ev) {
+      ev.currentTarget.classList.remove('bg-amber-100/50', 'border-[#8C5E37]');
+    }
+
+    function handleDrop(ev, targetStatus) {
+      ev.preventDefault();
+      ev.currentTarget.classList.remove('bg-amber-100/50', 'border-[#8C5E37]');
+      const idStr = ev.dataTransfer.getData("text/plain");
+      const id = parseInt(idStr, 10);
+      if (!isNaN(id)) {
+        moveTask(id, targetStatus);
+      }
+    }
+
+    function updateKanbanCounters() {
+      const notStarted = globalComplaints.filter(c => (taskStatusMap[c.id] || 'not_started') === 'not_started').length;
+      const underProcess = globalComplaints.filter(c => taskStatusMap[c.id] === 'under_process').length;
+      const completed = globalComplaints.filter(c => taskStatusMap[c.id] === 'completed').length;
+
+      const elNotStarted = document.getElementById('kanbanCountNotStarted');
+      const elUnderProcess = document.getElementById('kanbanCountUnderProcess');
+      const elCompleted = document.getElementById('kanbanCountCompleted');
+
+      if (elNotStarted) elNotStarted.textContent = notStarted;
+      if (elUnderProcess) elUnderProcess.textContent = underProcess;
+      if (elCompleted) elCompleted.textContent = completed;
+    }
+
+    function renderKanbanBoard() {
+      const colNotStarted = document.getElementById('kanbanColNotStarted');
+      const colUnderProcess = document.getElementById('kanbanColUnderProcess');
+      const colCompleted = document.getElementById('kanbanColCompleted');
+
+      if (!colNotStarted || !colUnderProcess || !colCompleted) return;
+
+      colNotStarted.innerHTML = '';
+      colUnderProcess.innerHTML = '';
+      colCompleted.innerHTML = '';
+
+      updateKanbanCounters();
+
+      let filtered = globalComplaints;
+      if (currentFilter === 'Critical') {
+        filtered = globalComplaints.filter(c => c.urgency === 'Critical');
+      } else if (currentFilter === 'High') {
+        filtered = globalComplaints.filter(c => c.urgency === 'High');
+      } else if (currentFilter === 'missing') {
+        filtered = globalComplaints.filter(c => c.has_missing_room);
+      } else if (currentFilter !== 'all') {
+        filtered = globalComplaints.filter(c => c.category === currentFilter);
+      }
+
+      filtered.forEach(c => {
+        const status = taskStatusMap[c.id] || 'not_started';
+        const catStyle = CATEGORY_STYLES[c.category] || CATEGORY_STYLES["Other"];
+
+        let urgencyBadge = '';
+        if (c.urgency === 'Critical') {
+          urgencyBadge = `<span class="text-[10px] font-black px-2 py-0.5 rounded-full bg-[#FDF0EB] text-[#A63012] border border-[#F6C9BA] animate-pulse">🚨 CRITICAL</span>`;
+        } else if (c.urgency === 'High') {
+          urgencyBadge = `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#FDF4EB] text-[#A04D14] border border-[#F8D4B4]">⚠️ HIGH</span>`;
+        } else if (c.urgency === 'Medium') {
+          urgencyBadge = `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#FEF9EE] text-[#946200] border border-[#FBE6A2]">🟡 MED</span>`;
+        } else {
+          urgencyBadge = `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#EEF7EE] text-[#28632B] border border-[#C2E3C4]">🟢 LOW</span>`;
+        }
+
+        const card = document.createElement('div');
+        card.draggable = true;
+        card.ondragstart = (e) => handleDragStart(e, c.id);
+        card.ondragend = (e) => handleDragEnd(e);
+
+        if (status === 'not_started') {
+          card.className = "wood-card p-3 rounded-xl border border-[#D5C1A6] bg-white shadow-xs hover:shadow-md transition cursor-grab active:cursor-grabbing space-y-2";
+          card.innerHTML = `
+            <div class="flex items-center justify-between gap-1">
+              <div class="flex items-center gap-1 flex-wrap">
+                ${urgencyBadge}
+                <span class="text-[10px] font-bold px-1.5 py-0.5 rounded ${catStyle.bg} ${catStyle.text} border ${catStyle.border}">${catStyle.icon} ${c.category}</span>
+              </div>
+              <span class="text-[10px] font-mono font-black text-[#5C4D3C] bg-[#EFE8DD] px-1.5 py-0.5 rounded border border-[#D5C1A6] shrink-0">${escapeHtml(c.room)}</span>
+            </div>
+            <p class="text-xs font-black text-[#382618] leading-snug">${escapeHtml(c.one_line_summary)}</p>
+            <p class="text-[11px] text-[#7A5B42] italic">Action: ${escapeHtml(c.action_required)}</p>
+            <div class="flex items-center justify-between pt-1.5 border-t border-[#F0E6D8]">
+              <span class="text-[10px] font-bold text-[#A63012] bg-[#FDF0EB] px-2 py-0.5 rounded border border-[#F6C9BA]">⏱️ SLA 15m</span>
+              <button onclick="moveTask(${c.id}, 'under_process')" class="text-[10px] font-black px-2.5 py-1 rounded-lg bg-[#3E2919] hover:bg-[#5A3C25] text-amber-200 transition shadow-xs flex items-center gap-1">
+                Dispatch ➔
+              </button>
+            </div>
+          `;
+          colNotStarted.appendChild(card);
+        } else if (status === 'under_process') {
+          card.className = "wood-card p-3 rounded-xl border-2 border-[#E5CA8F] bg-[#FFFDF7] shadow-xs hover:shadow-md transition cursor-grab active:cursor-grabbing space-y-2";
+          card.innerHTML = `
+            <div class="flex items-center justify-between gap-1">
+              <div class="flex items-center gap-1 flex-wrap">
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#FEF7E6] text-[#D97706] border border-[#FDE6A5] animate-pulse">🟡 In Progress</span>
+                <span class="text-[10px] font-bold px-1.5 py-0.5 rounded ${catStyle.bg} ${catStyle.text} border ${catStyle.border}">${catStyle.icon} ${c.category}</span>
+              </div>
+              <span class="text-[10px] font-mono font-black text-[#5C4D3C] bg-[#EFE8DD] px-1.5 py-0.5 rounded border border-[#D5C1A6] shrink-0">${escapeHtml(c.room)}</span>
+            </div>
+            <p class="text-xs font-black text-[#382618] leading-snug">${escapeHtml(c.one_line_summary)}</p>
+            <p class="text-[11px] text-[#A04D14] font-medium">👷 Crew assigned & responding on-site</p>
+            <div class="flex items-center justify-between pt-1.5 border-t border-[#F0E6D8] gap-2">
+              <button onclick="moveTask(${c.id}, 'not_started')" class="text-[10px] font-bold text-[#7A5B42] hover:text-[#382618]">
+                ↩ Back
+              </button>
+              <button onclick="moveTask(${c.id}, 'completed')" class="text-[10px] font-black px-2.5 py-1 rounded-lg bg-[#2D5A27] hover:bg-[#20441C] text-white transition shadow-xs flex items-center gap-1">
+                ✓ Mark Resolved
+              </button>
+            </div>
+          `;
+          colUnderProcess.appendChild(card);
+        } else if (status === 'completed') {
+          card.className = "wood-card p-3 rounded-xl border border-[#B9DCBA] bg-[#FAFDFA] shadow-xs hover:shadow-md transition cursor-grab active:cursor-grabbing space-y-2 opacity-90";
+          card.innerHTML = `
+            <div class="flex items-center justify-between gap-1">
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#EEF7EE] text-[#16A34A] border border-[#C2E3C4]">🟢 Task Completed</span>
+              <span class="text-[10px] font-mono font-bold text-[#28632B] bg-[#E2F0E3] px-1.5 py-0.5 rounded shrink-0">${escapeHtml(c.room)}</span>
+            </div>
+            <p class="text-xs font-bold text-[#556B2F] line-through leading-snug">${escapeHtml(c.one_line_summary)}</p>
+            <div class="flex items-center justify-between pt-1.5 border-t border-[#E8F2E8]">
+              <span class="text-[10px] text-[#28632B] font-bold">✓ Action Logged</span>
+              <button onclick="moveTask(${c.id}, 'under_process')" class="text-[10px] font-bold text-[#7A5B42] hover:text-[#382618]">
+                ↩ Reopen
+              </button>
+            </div>
+          `;
+          colCompleted.appendChild(card);
+        }
+      });
+
+      if (colNotStarted.children.length === 0) {
+        colNotStarted.innerHTML = '<p class="text-[11px] text-[#A89279] text-center py-8 italic">No pending tasks! All clear.</p>';
+      }
+      if (colUnderProcess.children.length === 0) {
+        colUnderProcess.innerHTML = '<p class="text-[11px] text-[#A89279] text-center py-8 italic">No tasks currently under process.</p>';
+      }
+      if (colCompleted.children.length === 0) {
+        colCompleted.innerHTML = '<p class="text-[11px] text-[#A89279] text-center py-8 italic">No completed tasks yet.</p>';
+      }
+    }
+
+    // ==========================================
+    // WHATSAPP CHAT IMPORT SYSTEM
+    // ==========================================
+    function openWhatsAppModal() {
+      const modal = document.getElementById('whatsappModal');
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function closeWhatsAppModal() {
+      const modal = document.getElementById('whatsappModal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function handleWhatsAppFileUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const text = e.target.result;
+        document.getElementById('whatsappPasteArea').value = text;
+        showToast(`Loaded ${file.name}! Click 'Clean & Import'.`, "📂");
+      };
+      reader.readAsText(file);
+    }
+
+    function cleanWhatsAppChat(rawText) {
+      if (!rawText) return "";
+      const lines = rawText.split('\n');
+      const cleaned = [];
+
+      for (let line of lines) {
+        line = line.trim();
+        if (!line) continue;
+
+        if (line.includes('Messages and calls are end-to-end encrypted') ||
+            line.includes('changed the group description') ||
+            line.includes('changed this group') ||
+            line.includes('security code changed') ||
+            line.includes('<Media omitted>') ||
+            line.includes('This message was deleted') ||
+            line.includes('added') || line.includes('left')) {
+          continue;
+        }
+
+        // Standardize WhatsApp timestamp formats:
+        // "28/10/24, 9:18 PM - +91...: text" -> "[9:18 PM] +91...: text"
+        let formatted = line
+          .replace(/^\[?\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4},?\s+(\d{1,2}:\d{2}(?::\d{2})?(?:\s*[AP]M)?)\]?\s*(?:-\s*)?/i, '[$1] ')
+          .trim();
+
+        cleaned.push(formatted);
+      }
+      return cleaned.join('\n');
+    }
+
+    function processWhatsAppImport() {
+      const raw = document.getElementById('whatsappPasteArea').value;
+      if (!raw.trim()) {
+        showToast("Please upload a file or paste chat text first", "⚠️");
+        return;
+      }
+      const cleaned = cleanWhatsAppChat(raw);
+      document.getElementById('chatDumpInput').value = cleaned;
+      closeWhatsAppModal();
+      showToast("WhatsApp chat imported & cleaned! Click 'Triage' to analyze.", "📲");
+      document.getElementById('inputCard').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function loadWhatsAppDemoPreset() {
+      const sample = `28/10/24, 9:15 PM - Messages and calls are end-to-end encrypted.
+28/10/24, 9:18 PM - +91 98765 12345: Warden Sir URGENT!! 2 unknown masked men jumped the back wall boundary near Wing A ground floor fire exit!
+28/10/24, 9:21 PM - Kitchen Staff (Mess): Heavy LPG cylinder gas leak smell coming from kitchen back corridor, please don't strike matches!
+28/10/24, 9:24 PM - Neha 208: Sir the water from 2nd floor water cooler is coming completely yellow and muddy with foul chemical smell, multiple students got stomach cramps
+28/10/24, 9:27 PM - Rahul B-104: Corridor light outside 104 is completely smashed and dark, very unsafe
+28/10/24, 9:30 PM - Sneha: Women's wing 2nd floor biometric security door lock failed and is wide open
+28/10/24, 9:33 PM - <Media omitted>
+28/10/24, 9:35 PM - Amit 315: Wi-Fi router dead right before TCS placement test submission at 10 PM!`;
+      document.getElementById('whatsappPasteArea').value = sample;
+      showToast("Loaded authentic WhatsApp export with Security, Gas & Water alerts!", "✨");
     }
 
     function setFilter(filter) {
@@ -1072,14 +1574,15 @@
       document.querySelectorAll('.filter-pill').forEach(btn => {
         btn.classList.remove('bg-[#3E2919]', 'text-[#FDF8F0]');
       });
-      event.target.classList.add('bg-[#3E2919]', 'text-[#FDF8F0]');
+      if (event && event.target) {
+        event.target.classList.add('bg-[#3E2919]', 'text-[#FDF8F0]');
+      }
       renderComplaintsList();
+      renderKanbanBoard();
     }
 
     function markResolved(id) {
-      resolvedMap[id] = true;
-      renderComplaintsList();
-      showToast("Marked action dispatched & logged!", "✅");
+      moveTask(id, 'completed');
     }
 
     function openDirectWhatsApp(replyText) {
@@ -1089,6 +1592,7 @@
 
     function renderComplaintsList() {
       const container = document.getElementById('complaintsList');
+      if (!container) return;
       container.innerHTML = '';
 
       let filtered = globalComplaints;
@@ -1098,9 +1602,14 @@
         filtered = globalComplaints.filter(c => c.urgency === 'High');
       } else if (currentFilter === 'missing') {
         filtered = globalComplaints.filter(c => c.has_missing_room);
+      } else if (currentFilter !== 'all') {
+        filtered = globalComplaints.filter(c => c.category === currentFilter);
       }
 
-      document.getElementById('displayCount').textContent = `${filtered.length} of ${globalComplaints.length}`;
+      const displayCount = document.getElementById('displayCount');
+      if (displayCount) {
+        displayCount.textContent = `${filtered.length} of ${globalComplaints.length}`;
+      }
 
       if (filtered.length === 0) {
         container.innerHTML = `

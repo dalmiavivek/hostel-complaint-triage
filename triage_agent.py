@@ -26,7 +26,7 @@ Triage Rules:
 3. Extract or infer:
    - "floor": e.g. "Ground", "1st Floor", "2nd Floor", "3rd Floor", "4th Floor", "Terrace", or "Unknown"
    - "wing": e.g. "Wing A", "Wing B", "Wing C", or "General"
-4. Classify category into: "Electrical & Fire", "Plumbing & Water", "Medical & Safety", "Infrastructure & Lift", "Internet & IT", "Food & Mess", "Discipline & Noise", "Cleanliness & Pest", "Other".
+4. Classify category into: "Electrical & Fire", "Plumbing & Water", "Medical & Safety", "Night Safety & Security", "Gas Leak & Biohazard", "Drinking Water & Hygiene", "Infrastructure & Lift", "Internet & IT", "Food & Mess", "Discipline & Noise", "Cleanliness & Pest", "Other".
 5. Assign Urgency:
    - "Critical": Immediate danger to life, fire risk, live electrical shock, trapped in elevator, or high fever/vomiting medical emergency.
    - "High": Safety hazard, smoking wire, flooding, locked in room, acute injury.
@@ -147,7 +147,25 @@ def detect_cascading_risks(complaints: List[Dict[str, Any]]) -> List[Dict[str, A
     if trapped:
         risks.append({
             "title": "🚨 Student Entrapment Emergency",
-            "description": f"Human life trapped in {trapped[0].get('room')}. Dispatch security master-key / maintenance team before oxygen or panic levels escalate.",
+            "description": f"Human life trapped in {trapped[0].get('room')}. Dispatch security master-key / maintenance team before panic levels escalate.",
+            "threat_level": "Critical"
+        })
+
+    # Check 4: Water contamination + stomach/fever symptoms
+    water_hygiene = [c for c in complaints if "drinking" in c.get("category", "").lower() or "cooler" in c.get("student_raw", "").lower() or "yellow" in c.get("student_raw", "").lower() or "tank" in c.get("student_raw", "").lower()]
+    if water_hygiene and medical_complaints:
+        risks.append({
+            "title": "🚰 Potable Water Contamination & Outbreak Threat",
+            "description": f"Contaminated drinking water supply ({water_hygiene[0].get('room')}) correlating with student illnesses. Seal RO coolers and test main water tank immediately.",
+            "threat_level": "Critical"
+        })
+
+    # Check 5: Gas leak / LPG smell
+    gas_leaks = [c for c in complaints if "gas" in c.get("student_raw", "").lower() or "lpg" in c.get("student_raw", "").lower() or "cylinder" in c.get("student_raw", "").lower()]
+    if gas_leaks:
+        risks.append({
+            "title": "🧪 Explosive Gas Leak Threat",
+            "description": f"Combustible gas smell detected ({gas_leaks[0].get('room')}). Evacuate vicinity, prohibit all open flames or electrical switches, and shut main LPG manifold.",
             "threat_level": "Critical"
         })
 

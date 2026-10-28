@@ -17,6 +17,12 @@
       "title": "☕ Scenario 3: Mixed Daily Hostel Chatter",
       "description": "Standard daily complaints with slang, missing rooms, and varied priorities.",
       "raw_text": "[09:15 AM] hostel resident: flush not working in ground floor washroom\n[09:30 AM] Dev 201: Main door lock jammed, we are locked inside room\n[10:05 AM] Shreya 402: Stray dog entered 4th floor corridor barking at students\n[10:40 AM] Parth 118: Table light plug point dead, electrician please\n[11:15 AM] rahul: canteen guy charging 5 rs extra for cold drink\n[11:45 AM] Siddharth B-301: ceiling fan regulator loose only runs at speed 5"
+    },
+    {
+      "id": "whatsapp_export",
+      "title": "📥 Scenario 4: WhatsApp Export (Security, Gas & Water Crisis)",
+      "description": "Authentic exported WhatsApp format covering Night Security, LPG Gas Leak, and Contaminated Drinking Water.",
+      "raw_text": "28/10/24, 9:15 PM - Messages and calls are end-to-end encrypted.\n28/10/24, 9:18 PM - +91 98765 12345: Warden Sir URGENT!! 2 unknown masked men jumped the back wall boundary near Wing A ground floor fire exit!\n28/10/24, 9:21 PM - Kitchen Staff (Mess): Heavy LPG cylinder gas leak smell coming from kitchen back corridor, please don't strike matches!\n28/10/24, 9:24 PM - Neha 208: Sir the water from 2nd floor water cooler is coming completely yellow and muddy with foul chemical smell, multiple students got stomach cramps\n28/10/24, 9:27 PM - Rahul B-104: Corridor light outside 104 is completely smashed and dark, very unsafe\n28/10/24, 9:30 PM - Sneha: Women's wing 2nd floor biometric security door lock failed and is wide open\n28/10/24, 9:33 PM - <Media omitted>\n28/10/24, 9:35 PM - Amit 315: Wi-Fi router dead right before TCS placement test submission at 10 PM!"
     }
   ]
 }

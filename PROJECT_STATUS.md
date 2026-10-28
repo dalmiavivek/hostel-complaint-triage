@@ -148,6 +148,28 @@ flowchart TD
   - [x] **📲 1-Tap Direct WhatsApp Chat Launch:** Deep-links directly to `wa.me` with pre-drafted replies for instant student communication.
   - [x] **⏱️ Golden-Hour SLA Timers & One-Click Resolve:** Real-time countdowns on hazard breaches with quick "Mark Dispatched" actions.
   - [x] **🖨️ Official Warden Incident Docket:** Clean printable report for the Chief Proctor / Dean of Student Affairs.
+- [x] **Step 9: Kanban Board, WhatsApp Import & Extra Security Categories**
+  - [x] **📌 Interactive 3-Column Tactical Kanban Board:**
+    - Dual View Switcher: Toggle seamlessly between **📋 Skim List View** and **📌 Kanban Board View**.
+    - 3 Status Columns:
+      - 🔴 **Not Yet Started** (Pending incoming triage with urgency badge & SLA countdown)
+      - 🟡 **Under Process** (Dispatched crew on-site with live responding indicator)
+      - 🟢 **Task Completed** (Logged & resolved with 1-click reopen capability)
+    - Full HTML5 Drag-and-Drop between columns + mobile-friendly 1-click status transition buttons (`Dispatch ➔`, `Mark Resolved ✓`, `Reopen ↩`).
+    - Dynamic column counter badges updating live.
+  - [x] **📥 WhatsApp Chat Import Engine:**
+    - Dedicated **"Import WhatsApp Chat"** button with modal dropzone.
+    - Supports uploading exported WhatsApp `_chat.txt` files (from iPhone, Android, or Desktop) or direct pasting of raw chat messages.
+    - Intelligent auto-cleaner regex removes timestamps, phone numbers, encryption headers, and media tags.
+    - Added 1-click **Scenario 4: WhatsApp Group Export** preset covering Night Security, LPG Gas Leak, and Drinking Water contamination.
+  - [x] **🛡️ Added Extra High-Stakes Hostel Categories:**
+    - 🛡️ **Night Safety & Security:** Broken biometric locks, perimeter intruders, dark corridors.
+    - 🧪 **Gas Leak & Biohazard:** Mess LPG cylinder leaks, burning odors, monsoon venomous pests.
+    - 🚰 **Drinking Water & Hygiene:** Contaminated RO coolers, muddy water, outbreak threat.
+    - Added dedicated filter pills and automated second-order cascading risk detectors for water contamination and combustible gas leaks.
+  - [x] **🎙️ Dual-Engine Walkie-Talkie Audio Hardening:**
+    - Fixed premature cancellation bug where `window.speechSynthesis.cancel()` right before `speak()` aborted audio output.
+    - Added HTML5 Audio stream fallback (`playAudioDispatchFallback`) that automatically fires if browser Web Speech API is muted or unavailable, guaranteeing clear spoken voice every time.
 
 ---
 
