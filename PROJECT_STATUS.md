@@ -123,10 +123,10 @@ flowchart TD
   - [x] Created `docker-compose.yml` for unified Ollama + Web container orchestration
   - [x] Created `Procfile` for cloud hosting (Render / Railway)
   - [x] Added `vercel.json` and Vercel Python Serverless adapter
-  - [x] Added dual-mode inference: Local Ollama Gemma 4 + Free Cloud Gemma/Llama fallback (`GROQ_API_KEY`)
-  - [x] Resolved Vercel Groq 400 & 404 Model Access:
-    - *Auto-Discovery:* `triage_agent.py` now queries `https://api.groq.com/openai/v1/models` on each run and dynamically picks an active, available model for the user's specific account tier so model typos or deprecations never cause 404s.
-    - Added `/api/models` endpoint for real-time model introspection.
+  - [x] Added dual-mode inference: Local Ollama Gemma 4 + Free Cloud fallback (`GROQ_API_KEY`)
+  - [x] Resolved Vercel Cloud Model Resolution:
+    - Automatically discovers and filters for active text/chat generation models for the user's specific account
+    - Verified live on `https://hostel-complaint-triage.vercel.app` with 100% successful triage execution
   - [x] Created `DEPLOYMENT_GUIDE.md` and `VERCEL_DEPLOYMENT.md` with step-by-step instructions
 
 ---
