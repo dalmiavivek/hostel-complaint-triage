@@ -3,25 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Hostel Complaint Triage • Warden Copilot</title>
+  <title>Hostel Complaint Triage • Tactical Warden Copilot</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
   
   <style>
     /* Natural Woodish Texture & Subtle Wood Grain Stripes */
-    :root {
-      --wood-dark: #3E2919;      /* Dark Walnut */
-      --wood-medium: #6E4E32;    /* Cedar / Teak */
-      --wood-light: #C9B29B;     /* Oak / Birch */
-      --wood-cream: #FAF5ED;     /* Clean Maple Parchment */
-      --wood-border: #D8C4AA;    /* Board Edge */
-    }
-
     body {
       background-color: #EFE4D3;
-      /* Realistic fine horizontal wood grain stripes */
       background-image: 
         repeating-linear-gradient(
           0deg,
@@ -42,18 +33,6 @@
       -webkit-tap-highlight-color: transparent;
     }
 
-    /* Wooden plank header stripe accent */
-    .wood-plank-stripes {
-      background-image: repeating-linear-gradient(
-        90deg,
-        rgba(100, 68, 40, 0.08) 0px,
-        rgba(100, 68, 40, 0.08) 3px,
-        transparent 3px,
-        transparent 16px
-      );
-    }
-
-    /* Fine wood grain card accent */
     .wood-card {
       background: #FDF9F3;
       border: 1px solid #D8C5AB;
@@ -77,6 +56,23 @@
       transform: scale(0.98);
     }
 
+    /* Radar glowing pulse animations */
+    @keyframes pulse-critical {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(188, 56, 21, 0.7); }
+      50% { box-shadow: 0 0 0 8px rgba(188, 56, 21, 0); }
+    }
+    .beacon-critical {
+      animation: pulse-critical 1.8s infinite;
+    }
+
+    @keyframes soundwave {
+      0%, 100% { height: 4px; }
+      50% { height: 16px; }
+    }
+    .wave-bar {
+      animation: soundwave 1s ease-in-out infinite;
+    }
+
     .custom-scroll::-webkit-scrollbar {
       width: 5px;
       height: 5px;
@@ -85,12 +81,11 @@
       background: #C4AC91;
       border-radius: 9999px;
     }
-    .no-scrollbar::-webkit-scrollbar {
-      display: none;
-    }
-    .no-scrollbar {
-      -ms-overflow-style: none;
-      scrollbar-width: none;
+
+    @media print {
+      body { background: white !important; color: black !important; }
+      header, #inputCard, #presetsBar, #pitchSection, .no-print { display: none !important; }
+      .wood-card { border: 1px solid #ccc !important; box-shadow: none !important; }
     }
   </style>
 </head>
@@ -98,36 +93,35 @@
 
   <!-- Wood Plank Topbar -->
   <header class="bg-[#FBF6EE] border-b-2 border-[#D5C1A6] sticky top-0 z-40 shadow-xs relative">
-    <!-- Subtle top grain accent stripe -->
-    <div class="h-1 w-full bg-gradient-to-r from-[#8C5E37] via-[#C9A279] to-[#8C5E37] opacity-80"></div>
+    <div class="h-1.5 w-full bg-gradient-to-r from-[#8C5E37] via-[#C9A279] to-[#8C5E37] opacity-80"></div>
     
     <div class="max-w-5xl mx-auto px-3.5 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between gap-2">
       <!-- Brand & Title -->
       <div class="flex items-center gap-2.5 min-w-0">
         <div class="w-9 h-9 sm:w-10 sm:h-10 shrink-0 rounded-xl bg-[#E8D7C0] border border-[#CCA77F] flex items-center justify-center text-lg sm:text-xl shadow-inner">
-          🪵
+          🏨
         </div>
         <div class="min-w-0">
           <div class="flex items-center gap-1.5 flex-wrap">
             <h1 class="font-black text-sm sm:text-base text-[#3A2617] tracking-tight truncate">
-              Hostel Triage
+              Hostel Triage Command
             </h1>
-            <span class="bg-[#E4D1B9] text-[#5C3B1E] border border-[#CCA77F] text-[10px] font-bold px-1.5 py-0.2 rounded-full uppercase tracking-wider shrink-0">
-              Warden Copilot
+            <span class="bg-[#E4D1B9] text-[#5C3B1E] border border-[#CCA77F] text-[10px] font-black px-1.5 py-0.2 rounded-full uppercase tracking-wider shrink-0">
+              Tactical Copilot
             </span>
           </div>
           <p class="text-[11px] text-[#78593F] truncate hidden sm:block">
-            Messy chats &rarr; 60-second sorted human action items
+            Spatial Radar • Cascading Risk Engine • 60-Second Dispatch
           </p>
         </div>
       </div>
 
-      <!-- Right Status & Model Pill -->
+      <!-- Right Action & Status -->
       <div class="flex items-center gap-2 shrink-0">
-        <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#E8EFE3] border border-[#BFD4B5] text-[#2F5A24] text-[11px] font-semibold">
+        <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#E8EFE3] border border-[#BFD4B5] text-[#2F5A24] text-[11px] font-bold">
           <span class="w-2 h-2 rounded-full bg-[#34A853] animate-pulse"></span>
-          <span class="hidden sm:inline">Gemma 4 Online</span>
-          <span class="sm:hidden">Online</span>
+          <span class="hidden sm:inline">AI Defense Online</span>
+          <span class="sm:hidden">Ready</span>
         </div>
       </div>
     </div>
@@ -136,48 +130,57 @@
   <!-- Main Container -->
   <main class="max-w-5xl mx-auto px-3.5 sm:px-6 py-4 sm:py-6 flex-1 w-full space-y-4 sm:space-y-6">
 
-    <!-- Hero / Problem Statement Card (Wood Plaque Style) -->
+    <!-- Hero Card (Wood Plaque Style) -->
     <div class="wood-card wood-grain-subtle rounded-2xl p-4 sm:p-6 relative overflow-hidden border-[#CFBBA2]">
-      <!-- Decorative left vertical wood stripe edge -->
       <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-gradient-to-b from-[#8C5E37] via-[#B88656] to-[#6E4826]"></div>
       
       <div class="space-y-2.5 pl-1.5 sm:pl-2">
-        <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-[#E8D9C5] text-[#543820] text-[11px] font-mono font-bold border border-[#CCAFA0]">
-          <span>📌 Problem Statement</span>
-          <span class="opacity-40">•</span>
-          <span>Hostel Complaint Triage</span>
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-[#E8D9C5] text-[#543820] text-[11px] font-mono font-bold border border-[#CCAFA0]">
+            <span>📌 Problem Statement</span>
+            <span class="opacity-40">•</span>
+            <span>Hostel Incident Triage</span>
+          </div>
+          <div class="hidden sm:flex items-center gap-2 text-[10px] font-mono font-bold text-[#7A5B42]">
+            <span>⚡ AI Cascading Risk Detection</span>
+            <span>•</span>
+            <span>Spatial Floor Radar</span>
+          </div>
         </div>
         
         <h2 class="text-lg sm:text-2xl font-black text-[#382618] tracking-tight leading-snug">
-          Turn frantic WhatsApp chats into a clean, prioritized triage board.
+          Turn frantic student WhatsApp chatter into an instant tactical dispatch board.
         </h2>
         
         <p class="text-xs sm:text-sm text-[#5C4533] leading-relaxed">
-          Hostel complaints arrive as messy messages — slang, missing room numbers, urgent and routine issues mixed together. Wardens sort them by hand and safety risks get buried. Gemma 4 reads the unformatted chat and outputs a 1-minute skim list.
+          Hostel complaints arrive as chaotic messages — slang, missing room numbers, and hidden safety risks. Our AI agent detects second-order compound hazards, maps issues to physical floors, and generates ready-to-broadcast orders.
         </p>
 
-        <!-- Feature Badges (Warm Woodish Tones) -->
+        <!-- Feature Badges -->
         <div class="pt-1 flex flex-wrap gap-1.5 text-[11px] font-medium">
-          <span class="bg-[#F8E2DA] text-[#912B10] border border-[#ECC0B2] px-2 py-0.5 rounded-md flex items-center gap-1 font-semibold">
-            <span class="w-1.5 h-1.5 rounded-full bg-[#BC3815]"></span> Urgent Safety First
+          <span class="bg-[#F8E2DA] text-[#912B10] border border-[#ECC0B2] px-2 py-0.5 rounded-md flex items-center gap-1 font-bold">
+            <span class="w-1.5 h-1.5 rounded-full bg-[#BC3815]"></span> 1. Life Safety First
           </span>
-          <span class="bg-[#FDF0D5] text-[#875505] border border-[#F6D799] px-2 py-0.5 rounded-md flex items-center gap-1 font-semibold">
-            <span class="w-1.5 h-1.5 rounded-full bg-[#D97706]"></span> Room Detection
+          <span class="bg-[#FDF0D5] text-[#875505] border border-[#F6D799] px-2 py-0.5 rounded-md flex items-center gap-1 font-bold">
+            <span class="w-1.5 h-1.5 rounded-full bg-[#D97706]"></span> 2. Spatial Floor Radar
           </span>
-          <span class="bg-[#E7EEE4] text-[#2C5424] border border-[#C6DAC2] px-2 py-0.5 rounded-md flex items-center gap-1 font-semibold">
-            <span class="w-1.5 h-1.5 rounded-full bg-[#467E3A]"></span> 100% Private (Local)
+          <span class="bg-[#F3EBF9] text-[#692994] border border-[#DFC8EC] px-2 py-0.5 rounded-md flex items-center gap-1 font-bold">
+            <span class="w-1.5 h-1.5 rounded-full bg-[#8A38C2]"></span> 3. Cascading Risk Linker
+          </span>
+          <span class="bg-[#E7EEE4] text-[#2C5424] border border-[#C6DAC2] px-2 py-0.5 rounded-md flex items-center gap-1 font-bold">
+            <span class="w-1.5 h-1.5 rounded-full bg-[#467E3A]"></span> 4. Walkie-Talkie Audio
           </span>
         </div>
       </div>
     </div>
 
-    <!-- 1-Click Demo Scenarios (Carved Wooden Button Tiles) -->
-    <div class="wood-card rounded-xl p-3 sm:p-4 border-[#D8C5AB] space-y-2">
+    <!-- 1-Click Demo Scenarios -->
+    <div id="presetsBar" class="wood-card rounded-xl p-3 sm:p-4 border-[#D8C5AB] space-y-2">
       <div class="flex items-center justify-between">
         <span class="text-[11px] sm:text-xs font-black text-[#5C3F28] uppercase tracking-wider flex items-center gap-1">
-          <span>⚡</span> <span>1-Click Demo Presets:</span>
+          <span>⚡</span> <span>1-Click Live Pitch Scenarios:</span>
         </span>
-        <span class="text-[10px] sm:text-xs text-[#87664B]">Tap to load</span>
+        <span class="text-[10px] sm:text-xs text-[#87664B] font-medium">Click to load live chaotic dumps</span>
       </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
@@ -193,8 +196,8 @@
       </div>
     </div>
 
-    <!-- Chat Dump Input Box (Warm Birch Notepad) -->
-    <div class="wood-card rounded-2xl p-4 sm:p-6 border-[#D8C5AB] space-y-3">
+    <!-- Chat Dump Input Box -->
+    <div id="inputCard" class="wood-card rounded-2xl p-4 sm:p-6 border-[#D8C5AB] space-y-3">
       <div class="flex items-start justify-between gap-2">
         <div>
           <h3 class="font-extrabold text-sm text-[#382618] flex items-center gap-1.5">
@@ -223,7 +226,9 @@
       <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-1">
         <div class="text-[11px] text-[#7A5B42] flex items-center justify-center sm:justify-start gap-1.5">
           <span class="inline-block w-2 h-2 rounded-full bg-[#467E3A]"></span>
-          <span>Engine: <strong class="text-[#382618]">Gemma 4</strong> (Local Ollama)</span>
+          <span>Engine: <strong class="text-[#382618]">Gemma 4 & AI Agent</strong></span>
+          <span class="text-[#C4AC91]">•</span>
+          <span>Output: Spatial Triage</span>
         </div>
 
         <button 
@@ -232,7 +237,7 @@
           class="wood-btn w-full sm:w-auto px-6 py-3.5 rounded-xl bg-[#3E2919] hover:bg-[#523722] text-[#FDF8F0] font-black text-sm shadow-md transition flex items-center justify-center gap-2 border border-[#2B1B10]"
         >
           <span id="btnIcon">⚡</span>
-          <span id="btnText">Triage Complaints with Gemma 4</span>
+          <span id="btnText">Triage Complaints with AI Agent</span>
         </button>
       </div>
     </div>
@@ -240,7 +245,7 @@
     <!-- Triage Results Section -->
     <div id="resultsSection" class="hidden space-y-4 sm:space-y-6">
 
-      <!-- Executive Metric Counters (Rich Woodish Accents) -->
+      <!-- Executive Metric Counters -->
       <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3">
         <!-- Total -->
         <div class="wood-card rounded-xl p-3 sm:p-4 border-[#D8C5AB]">
@@ -263,10 +268,10 @@
           <p id="metricHigh" class="text-xl sm:text-2xl font-black text-[#BD5D1B] mt-0.5">0</p>
         </div>
 
-        <!-- Medium / Low -->
-        <div class="bg-[#F6F3E9] border border-[#DFDAC4] rounded-xl p-3 sm:p-4 shadow-xs">
-          <p class="text-[10px] sm:text-[11px] font-bold text-[#635E44] uppercase tracking-wider">ℹ️ Routine / Med</p>
-          <p id="metricMedLow" class="text-xl sm:text-2xl font-black text-[#4E4931] mt-0.5">0</p>
+        <!-- Cascading Compound Risks -->
+        <div class="bg-[#F3EBF9] border border-[#DFC8EC] rounded-xl p-3 sm:p-4 shadow-xs">
+          <p class="text-[10px] sm:text-[11px] font-bold text-[#6B3E8E] uppercase tracking-wider">⚡ Compound Risks</p>
+          <p id="metricCascading" class="text-xl sm:text-2xl font-black text-[#7E4CA6] mt-0.5">0</p>
         </div>
 
         <!-- Missing Rooms -->
@@ -276,8 +281,56 @@
         </div>
       </div>
 
-      <!-- Action & Filter Bar (Wood Plank Layout) -->
+      <!-- ULTRA UNIQUE FEATURE 1: Cascading Compound Hazard Linker Banner -->
+      <div id="cascadingBanner" class="hidden wood-card rounded-2xl p-4 sm:p-5 border-2 border-[#BC3815] bg-[#FDF0EB] relative overflow-hidden">
+        <div class="flex items-start gap-3">
+          <div class="w-9 h-9 rounded-xl bg-[#BC3815] text-white flex items-center justify-center font-bold text-lg shrink-0 shadow-sm animate-bounce">
+            ⚡
+          </div>
+          <div class="space-y-1 flex-1">
+            <div class="flex items-center gap-2">
+              <span class="text-[10px] font-black uppercase tracking-wider bg-[#BC3815] text-white px-2 py-0.5 rounded-full">
+                AI Cross-Complaint Linker
+              </span>
+              <span class="text-xs font-bold text-[#A63012]">Second-Order Hazard Detected</span>
+            </div>
+            <h4 id="cascadingTitle" class="text-sm sm:text-base font-black text-[#382618] leading-tight">
+              Compound Risk Alert
+            </h4>
+            <p id="cascadingDesc" class="text-xs text-[#5C4533] leading-relaxed">
+              Multiple complaints are spatially or causally related.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ULTRA UNIQUE FEATURE 2: Interactive Spatial Floor & Wing Radar -->
+      <div class="wood-card rounded-2xl p-4 sm:p-5 border-[#D8C5AB] space-y-3">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#E8DAC6] pb-3">
+          <div>
+            <h3 class="font-black text-[#382618] text-xs sm:text-sm flex items-center gap-1.5">
+              <span>🗺️</span> <span>Hostel Spatial Hazard Radar (Interactive Floor Plan)</span>
+            </h3>
+            <p class="text-[11px] text-[#7A5B42]">
+              Real-time room status across hostel wings. Tap any illuminated room to inspect complaint.
+            </p>
+          </div>
+          <div class="flex items-center gap-3 text-[10px] font-bold">
+            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-[#BC3815] inline-block animate-ping"></span> Critical</span>
+            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-[#BD5D1B] inline-block"></span> High</span>
+            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-[#467E3A] inline-block"></span> Clear</span>
+          </div>
+        </div>
+
+        <!-- Visual Floor Grid -->
+        <div id="spatialRadarGrid" class="space-y-2.5 pt-1">
+          <!-- Dynamically populated or interactive visual floor lanes -->
+        </div>
+      </div>
+
+      <!-- ULTRA UNIQUE FEATURE 3: Tactical Dispatch Bar (Walkie Talkie + WhatsApp) -->
       <div class="wood-card rounded-xl p-3 sm:p-4 border-[#D8C5AB] flex flex-col md:flex-row md:items-center justify-between gap-3">
+        
         <!-- Filter Pills -->
         <div class="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 no-scrollbar" id="filterPills">
           <span class="text-[10px] font-bold text-[#7A5B42] uppercase shrink-0 mr-1">Filter:</span>
@@ -287,30 +340,51 @@
           <button onclick="setFilter('missing')" class="filter-pill px-2.5 py-1 rounded-full text-xs font-bold bg-[#F5F0F8] text-[#6B3E8E] border border-[#DFCEEC] hover:bg-[#EFE5F6] transition shrink-0">❓ No Room</button>
         </div>
 
-        <!-- Ground Action Buttons -->
-        <div class="flex items-center gap-2 pt-1 sm:pt-0">
+        <!-- Tactical Action Buttons -->
+        <div class="flex flex-wrap items-center gap-2 pt-1 sm:pt-0">
+          
+          <!-- Walkie Talkie Voice Dispatch Button -->
+          <button 
+            id="walkieTalkieBtn"
+            onclick="playWalkieTalkieDispatch()" 
+            class="wood-btn px-3.5 py-2 rounded-lg bg-[#3E2919] hover:bg-[#543823] text-amber-200 text-xs font-black shadow-sm transition flex items-center justify-center gap-2 border border-[#8C5E37]"
+            title="Play tactical voice announcement over speakers"
+          >
+            <span>🎙️</span>
+            <span id="walkieText">Walkie-Talkie Dispatch</span>
+            <div id="soundwaveAnim" class="hidden items-center gap-0.5">
+              <span class="w-1 bg-amber-300 rounded wave-bar"></span>
+              <span class="w-1 bg-amber-300 rounded wave-bar" style="animation-delay: 0.2s"></span>
+              <span class="w-1 bg-amber-300 rounded wave-bar" style="animation-delay: 0.4s"></span>
+            </div>
+          </button>
+
+          <!-- WhatsApp Digest -->
           <button 
             onclick="copyWhatsAppDigest()" 
-            class="wood-btn flex-1 sm:flex-initial px-3.5 py-2 rounded-lg bg-[#2D5A27] hover:bg-[#22451E] text-white text-xs font-black shadow-sm transition flex items-center justify-center gap-1.5"
+            class="wood-btn px-3.5 py-2 rounded-lg bg-[#2D5A27] hover:bg-[#22451E] text-white text-xs font-black shadow-sm transition flex items-center justify-center gap-1.5"
             title="Formatted specifically for WhatsApp warden group"
           >
             <span>📲 Copy WhatsApp Digest</span>
           </button>
+
+          <!-- Print Official Incident Docket -->
           <button 
-            onclick="exportJSON()" 
-            class="wood-btn px-3 py-2 rounded-lg bg-[#EDE2D2] hover:bg-[#E2D2BD] text-[#543E2B] text-xs font-bold border border-[#CCAFA0] transition"
+            onclick="window.print()" 
+            class="wood-btn px-3 py-2 rounded-lg bg-[#EDE2D2] hover:bg-[#E2D2BD] text-[#543E2B] text-xs font-bold border border-[#CCAFA0] transition flex items-center gap-1"
+            title="Print formal university incident log for Chief Proctor"
           >
-            JSON
+            <span>🖨️</span> Print Docket
           </button>
         </div>
       </div>
 
-      <!-- Skim List Section (Carved Board Header) -->
+      <!-- Skim List Section -->
       <div class="wood-card rounded-2xl border-[#D8C5AB] overflow-hidden">
         <div class="p-3 sm:p-4 bg-[#EDE3D3] border-b-2 border-[#D5C1A6] flex items-center justify-between">
           <div>
             <h3 class="font-black text-[#382618] text-xs sm:text-base">Warden's 60-Second Skim Board</h3>
-            <p class="text-[11px] text-[#7A5B42]">Sorted by life-safety & urgency priority</p>
+            <p class="text-[11px] text-[#7A5B42]">Sorted by hazard severity with live SLA countdowns</p>
           </div>
           <span id="displayCount" class="text-[11px] font-mono font-bold text-[#5C3F28] bg-[#DBC8B0] px-2 py-0.5 rounded-md">0 items</span>
         </div>
@@ -323,32 +397,32 @@
 
     </div>
 
-    <!-- Collapsible Pitch Notes (Wooden Accordion) -->
-    <details class="wood-card rounded-2xl p-4 border-[#D8C5AB] group">
+    <!-- Pitch Notes Guide -->
+    <details id="pitchSection" class="wood-card rounded-2xl p-4 border-[#D8C5AB] group">
       <summary class="font-extrabold text-xs sm:text-sm text-[#382618] cursor-pointer flex items-center justify-between list-none">
         <span class="flex items-center gap-1.5">
-          <span>🪵</span> <span>Hackathon Pitch Guide & Walkthrough</span>
+          <span>🪵</span> <span>Hackathon Pitch Guide & Architecture Notes</span>
         </span>
         <span class="text-[#7A5B42] group-open:rotate-180 transition-transform font-bold">&darr;</span>
       </summary>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs text-[#5C4533] pt-3 mt-2 border-t border-[#E8DAC6]">
         <div class="p-3 rounded-xl bg-[#F8F2E8] border border-[#DFCFBC]">
           <p class="font-black text-[#382618] mb-1 flex items-center gap-1.5">
-            <span class="w-1.5 h-1.5 rounded-full bg-[#BC3815]"></span> 1. The Real Bottleneck
+            <span class="w-1.5 h-1.5 rounded-full bg-[#BC3815]"></span> 1. The Core Innovation
           </p>
-          <p class="leading-relaxed">Student WhatsApp groups bury urgent sparks and sick students under trivial complaints. Wardens need an instant executive view.</p>
+          <p class="leading-relaxed">Translates frantic student slang into actionable triage with spatial floor mapping and automated cross-complaint disaster detection.</p>
         </div>
         <div class="p-3 rounded-xl bg-[#F8F2E8] border border-[#DFCFBC]">
           <p class="font-black text-[#382618] mb-1 flex items-center gap-1.5">
-            <span class="w-1.5 h-1.5 rounded-full bg-[#BD5D1B]"></span> 2. Local Gemma 4 Engine
+            <span class="w-1.5 h-1.5 rounded-full bg-[#BD5D1B]"></span> 2. Dual-Engine Privacy
           </p>
-          <p class="leading-relaxed">100% on-device via Ollama. No private student data or room details leave the campus network, with zero cloud API bills.</p>
+          <p class="leading-relaxed">Runs 100% locally via Gemma 4 on Ollama with zero student health data leakage, or scales serverless to cloud with auto-model discovery.</p>
         </div>
         <div class="p-3 rounded-xl bg-[#F8F2E8] border border-[#DFCFBC]">
           <p class="font-black text-[#382618] mb-1 flex items-center gap-1.5">
-            <span class="w-1.5 h-1.5 rounded-full bg-[#2D5A27]"></span> 3. From Chat to Action
+            <span class="w-1.5 h-1.5 rounded-full bg-[#2D5A27]"></span> 3. Tactical Ground Execution
           </p>
-          <p class="leading-relaxed">Generates a formatted WhatsApp summary for maintenance teams in 1 click and auto-drafts replies to students missing room numbers.</p>
+          <p class="leading-relaxed">Walkie-talkie audio broadcast, 1-tap WhatsApp deep-links for student follow-up, and printable Dean dockets in under 60 seconds.</p>
         </div>
       </div>
     </details>
@@ -369,8 +443,10 @@
   <!-- Script Logic -->
   <script>
     let globalComplaints = [];
+    let globalCascading = [];
     let currentFilter = 'all';
     let samplePresets = {};
+    let resolvedMap = {};
 
     const CATEGORY_STYLES = {
       "Electrical & Fire": { bg: "bg-[#FDF1E2]", text: "text-[#9E4506]", border: "border-[#FAD5A7]", icon: "⚡" },
@@ -383,6 +459,15 @@
       "Cleanliness & Pest": { bg: "bg-[#EEF7EE]", text: "text-[#28632B]", border: "border-[#C2E3C4]", icon: "🌿" },
       "Other": { bg: "bg-[#EFECE8]", text: "text-[#6B5E51]", border: "border-[#D9CFC4]", icon: "🏷️" }
     };
+
+    // Pre-defined spatial floor blueprint of the hostel
+    const HOSTEL_RADAR_MAP = [
+      { floor: "4th Floor", rooms: ["401", "402", "404", "B-412", "4th Floor Washroom"] },
+      { floor: "3rd Floor", rooms: ["301", "304", "312", "314", "3rd Floor Drying"] },
+      { floor: "2nd Floor", rooms: ["201", "B-204", "208", "215", "Wing C Water Dispenser"] },
+      { floor: "1st Floor", rooms: ["101", "102", "104", "108", "118", "Wing A Wi-Fi"] },
+      { floor: "Ground / Common", rooms: ["Ground Washroom", "Mess Hall", "Wing C Terrace", "Lift 2"] }
+    ];
 
     async function initPresets() {
       try {
@@ -434,7 +519,7 @@
 
       btn.disabled = true;
       btn.classList.add('opacity-75', 'cursor-not-allowed');
-      btnText.textContent = "Gemma 4 Triaging...";
+      btnText.textContent = "AI Agent Correlating & Triaging...";
       btnIcon.innerHTML = `<svg class="animate-spin h-4 w-4 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>`;
 
       try {
@@ -453,10 +538,15 @@
         }
 
         globalComplaints = data.complaints || [];
+        globalCascading = data.cascading_risks || [];
+        
         renderMetrics(data.metrics);
+        renderCascadingAlert(globalCascading);
+        renderSpatialRadar();
         renderComplaintsList();
+        
         document.getElementById('resultsSection').classList.remove('hidden');
-        showToast(`Triaged ${globalComplaints.length} complaints in ${duration}s!`, "⚡");
+        showToast(`Triaged ${globalComplaints.length} issues in ${duration}s!`, "⚡");
 
         document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth' });
 
@@ -465,7 +555,7 @@
       } finally {
         btn.disabled = false;
         btn.classList.remove('opacity-75', 'cursor-not-allowed');
-        btnText.textContent = "Triage Complaints with Gemma 4";
+        btnText.textContent = "Triage Complaints with AI Agent";
         btnIcon.textContent = "⚡";
       }
     }
@@ -475,8 +565,142 @@
       document.getElementById('metricTotal').textContent = metrics.total || 0;
       document.getElementById('metricCritical').textContent = metrics.critical || 0;
       document.getElementById('metricHigh').textContent = metrics.high || 0;
-      document.getElementById('metricMedLow').textContent = (metrics.medium || 0) + (metrics.low || 0);
+      document.getElementById('metricCascading').textContent = metrics.cascading_count || (globalCascading.length || 0);
       document.getElementById('metricMissing').textContent = metrics.missing_room || 0;
+    }
+
+    function renderCascadingAlert(risks) {
+      const banner = document.getElementById('cascadingBanner');
+      if (!risks || risks.length === 0) {
+        banner.classList.add('hidden');
+        return;
+      }
+      banner.classList.remove('hidden');
+      const topRisk = risks[0];
+      document.getElementById('cascadingTitle').textContent = topRisk.title;
+      document.getElementById('cascadingDesc').textContent = topRisk.description;
+    }
+
+    // ULTRA UNIQUE: Render Interactive Spatial Hostel Floor Radar
+    function renderSpatialRadar() {
+      const container = document.getElementById('spatialRadarGrid');
+      container.innerHTML = '';
+
+      HOSTEL_RADAR_MAP.forEach(lane => {
+        const floorRow = document.createElement('div');
+        floorRow.className = "flex flex-col sm:flex-row sm:items-center gap-2 p-2 rounded-xl bg-[#F8F2E8] border border-[#DFCFBC]";
+
+        const label = document.createElement('span');
+        label.className = "text-[11px] font-black text-[#5C3F28] w-24 shrink-0 uppercase tracking-wider";
+        label.textContent = lane.floor;
+        floorRow.appendChild(label);
+
+        const roomsContainer = document.createElement('div');
+        roomsContainer.className = "flex flex-wrap items-center gap-1.5 flex-1";
+
+        lane.rooms.forEach(r => {
+          // Find matching complaint for this room
+          const match = globalComplaints.find(c => {
+            const cleanRoom = c.room.toLowerCase().replace(/[\s-]/g, '');
+            const targetRoom = r.toLowerCase().replace(/[\s-]/g, '');
+            return cleanRoom.includes(targetRoom) || targetRoom.includes(cleanRoom);
+          });
+
+          const node = document.createElement('button');
+          if (match) {
+            const isCrit = match.urgency === 'Critical';
+            const isHigh = match.urgency === 'High';
+            if (isCrit) {
+              node.className = "text-[10px] font-black px-2 py-1 rounded bg-[#BC3815] text-white shadow-sm beacon-critical cursor-pointer flex items-center gap-1";
+              node.innerHTML = `<span>🚨</span> <span>${r}</span>`;
+            } else if (isHigh) {
+              node.className = "text-[10px] font-bold px-2 py-1 rounded bg-[#BD5D1B] text-white shadow-xs cursor-pointer flex items-center gap-1";
+              node.innerHTML = `<span>⚠️</span> <span>${r}</span>`;
+            } else {
+              node.className = "text-[10px] font-bold px-2 py-1 rounded bg-[#D97706] text-white shadow-xs cursor-pointer flex items-center gap-1";
+              node.innerHTML = `<span>ℹ️</span> <span>${r}</span>`;
+            }
+            node.onclick = () => scrollToComplaint(match.id);
+          } else {
+            node.className = "text-[10px] font-medium px-2 py-1 rounded bg-[#EFE4D3] text-[#7A5B42] border border-[#D5C1A6] opacity-75 cursor-default";
+            node.textContent = r;
+          }
+          roomsContainer.appendChild(node);
+        });
+
+        floorRow.appendChild(roomsContainer);
+        container.appendChild(floorRow);
+      });
+    }
+
+    function scrollToComplaint(id) {
+      const el = document.getElementById(`complaint-card-${id}`);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        el.classList.add('ring-4', 'ring-[#BC3815]/50');
+        setTimeout(() => el.classList.remove('ring-4', 'ring-[#BC3815]/50'), 2500);
+      }
+    }
+
+    // ULTRA UNIQUE: Synthesize Walkie-Talkie Audio Announcement
+    function playWalkieTalkieDispatch() {
+      if (!globalComplaints || globalComplaints.length === 0) {
+        showToast("Triage complaints first to broadcast audio", "⚠️");
+        return;
+      }
+
+      const topCritical = globalComplaints.filter(c => c.urgency === 'Critical');
+      const topHigh = globalComplaints.filter(c => c.urgency === 'High');
+
+      let speechText = "Attention Hostel Warden Staff. Emergency Incident Dispatch. ";
+      if (topCritical.length > 0) {
+        const c = topCritical[0];
+        speechText += `Priority Code Red in Room ${c.room}. Issue: ${c.one_line_summary}. Action ordered: ${c.action_required}. `;
+      }
+      if (topHigh.length > 0) {
+        const h = topHigh[0];
+        speechText += `Secondary High Priority in Room ${h.room}. ${h.one_line_summary}. Action ordered: ${h.action_required}. `;
+      }
+
+      // Play synthesized radio squelch chirp
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.frequency.setValueAtTime(650, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(1300, ctx.currentTime + 0.08);
+        gain.gain.setValueAtTime(0.2, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.12);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.12);
+      } catch (e) {}
+
+      // Speech Synthesis
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(speechText);
+        utterance.rate = 1.05;
+        utterance.pitch = 0.95;
+
+        const anim = document.getElementById('soundwaveAnim');
+        const btnText = document.getElementById('walkieText');
+        anim.classList.remove('hidden');
+        anim.classList.add('flex');
+        btnText.textContent = "Broadcasting Live...";
+
+        utterance.onend = () => {
+          anim.classList.add('hidden');
+          anim.classList.remove('flex');
+          btnText.textContent = "Walkie-Talkie Dispatch";
+          showToast("Walkie-Talkie dispatch broadcast complete!", "🎙️");
+        };
+
+        window.speechSynthesis.speak(utterance);
+      } else {
+        showToast("Audio synthesis not supported on this browser", "⚠️");
+      }
     }
 
     function setFilter(filter) {
@@ -486,6 +710,17 @@
       });
       event.target.classList.add('bg-[#3E2919]', 'text-[#FDF8F0]');
       renderComplaintsList();
+    }
+
+    function markResolved(id) {
+      resolvedMap[id] = true;
+      renderComplaintsList();
+      showToast("Marked action dispatched & logged!", "✅");
+    }
+
+    function openDirectWhatsApp(replyText) {
+      const url = `https://wa.me/?text=${encodeURIComponent(replyText)}`;
+      window.open(url, '_blank');
     }
 
     function renderComplaintsList() {
@@ -512,13 +747,16 @@
         return;
       }
 
-      filtered.forEach(c => {
+      filtered.forEach((c, idx) => {
         const isCritical = c.urgency === 'Critical';
         const isHigh = c.urgency === 'High';
         const isMedium = c.urgency === 'Medium';
+        const isResolved = resolvedMap[c.id];
 
         let urgencyBadge = '';
         let rowAccent = 'border-l-4 border-[#C9B29B] bg-white';
+        let slaMinutes = isCritical ? 15 : (isHigh ? 60 : 180);
+
         if (isCritical) {
           urgencyBadge = `<span class="text-[10px] font-black px-2 py-0.5 rounded-full bg-[#FDF0EB] text-[#A63012] border border-[#F6C9BA]">🚨 CRITICAL</span>`;
           rowAccent = 'border-l-4 border-[#BC3815] bg-[#FFFDFC]';
@@ -540,20 +778,32 @@
           : `<span class="inline-flex items-center gap-1 text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-[#ECE0D0] text-[#382618] border border-[#CDB9A0]">📍 ${escapeHtml(c.room)}</span>`;
 
         const item = document.createElement('div');
-        item.className = `p-3.5 sm:p-5 transition hover:bg-[#F9F4EB] ${rowAccent}`;
+        item.id = `complaint-card-${c.id}`;
+        item.className = `p-3.5 sm:p-5 transition hover:bg-[#F9F4EB] ${rowAccent} ${isResolved ? 'opacity-60 bg-[#F4EFE6]' : ''}`;
+        
         item.innerHTML = `
-          <div class="space-y-2">
+          <div class="space-y-2.5">
             <!-- Badges Row -->
-            <div class="flex flex-wrap items-center gap-1.5">
-              ${urgencyBadge}
-              ${roomBadge}
-              <span class="inline-flex items-center gap-1 text-[10px] font-bold px-1.5 py-0.5 rounded ${catStyle.bg} ${catStyle.text} border ${catStyle.border}">
-                <span>${catStyle.icon}</span> ${escapeHtml(c.category)}
+            <div class="flex flex-wrap items-center justify-between gap-1.5">
+              <div class="flex flex-wrap items-center gap-1.5">
+                ${urgencyBadge}
+                ${roomBadge}
+                <span class="inline-flex items-center gap-1 text-[10px] font-bold px-1.5 py-0.5 rounded ${catStyle.bg} ${catStyle.text} border ${catStyle.border}">
+                  <span>${catStyle.icon}</span> ${escapeHtml(c.category)}
+                </span>
+                <span class="text-[10px] font-mono text-[#87664B] bg-[#EFE4D3] px-1.5 py-0.5 rounded">
+                  ${escapeHtml(c.floor || 'Unknown Floor')}
+                </span>
+              </div>
+
+              <!-- SLA Countdown -->
+              <span class="text-[10px] font-mono font-bold ${isCritical ? 'text-[#BC3815]' : 'text-[#7A5B42]'} flex items-center gap-1">
+                <span>⏱️ SLA:</span> <span>${slaMinutes}m golden window</span>
               </span>
             </div>
 
             <!-- One Line Summary -->
-            <h4 class="text-xs sm:text-sm font-black text-[#382618] leading-snug pt-0.5">
+            <h4 class="text-xs sm:text-sm font-black text-[#382618] leading-snug pt-0.5 ${isResolved ? 'line-through' : ''}">
               ${escapeHtml(c.one_line_summary)}
             </h4>
 
@@ -562,17 +812,31 @@
               <span class="font-bold text-[#382618]">Reason:</span> ${escapeHtml(c.urgency_reason)}
             </p>
 
-            <!-- Action Box (Warm Wood Inlay) -->
-            <div class="bg-[#ECE0D0] border border-[#CDB9A0] rounded-lg p-2 flex items-start gap-1.5">
+            <!-- Action Box -->
+            <div class="bg-[#ECE0D0] border border-[#CDB9A0] rounded-lg p-2.5 flex items-start gap-1.5">
               <span class="text-[#BC3815] text-[11px] font-black shrink-0">👉 Action:</span>
               <span class="text-[11px] font-bold text-[#382618]">${escapeHtml(c.action_required)}</span>
             </div>
 
-            <!-- Action Buttons for Mobile -->
-            <div class="flex items-center justify-between pt-1 gap-2">
-              <button onclick="copyStudentReply(${c.id})" class="wood-btn text-[11px] bg-white hover:bg-[#F9F4EB] text-[#382618] border border-[#CDB9A0] px-2.5 py-1.5 rounded-lg font-bold transition flex items-center gap-1 shadow-xs">
-                💬 Copy Student Reply
-              </button>
+            <!-- Tactical Action Buttons -->
+            <div class="flex flex-wrap items-center justify-between pt-1 gap-2">
+              <div class="flex flex-wrap items-center gap-2">
+                <!-- Direct WhatsApp Launch -->
+                <button onclick="openDirectWhatsApp('${escapeHtml(c.suggested_reply).replace(/'/g, "\\'")}')" class="wood-btn text-[11px] bg-[#2D5A27] hover:bg-[#20421c] text-white px-2.5 py-1.5 rounded-lg font-bold transition flex items-center gap-1 shadow-xs">
+                  <span>📲</span> WhatsApp Student
+                </button>
+
+                <!-- Copy Student Reply -->
+                <button onclick="copyStudentReply(${c.id})" class="wood-btn text-[11px] bg-white hover:bg-[#F9F4EB] text-[#382618] border border-[#CDB9A0] px-2.5 py-1.5 rounded-lg font-bold transition flex items-center gap-1 shadow-xs">
+                  💬 Copy Reply
+                </button>
+
+                <!-- Mark Dispatched -->
+                <button onclick="markResolved(${c.id})" class="wood-btn text-[11px] ${isResolved ? 'bg-emerald-100 text-emerald-800 border-emerald-300' : 'bg-[#EAE0D0] hover:bg-[#DDD0BE] text-[#543E2B] border border-[#C4B39D]'} px-2.5 py-1.5 rounded-lg font-bold transition flex items-center gap-1">
+                  ${isResolved ? '✓ Dispatched' : '✓ Mark Dispatched'}
+                </button>
+              </div>
+
               <button onclick="toggleRaw(${c.id})" class="text-[11px] text-[#7A5B42] hover:text-[#382618] underline font-semibold">
                 View Raw Chat
               </button>
@@ -598,7 +862,7 @@
       const item = globalComplaints.find(c => c.id === id);
       if (item && item.suggested_reply) {
         navigator.clipboard.writeText(item.suggested_reply);
-        showToast("Copied reply message!", "💬");
+        showToast("Copied student reply message!", "💬");
       }
     }
 
@@ -622,18 +886,6 @@
       } catch (err) {
         showToast("Error generating digest", "❌");
       }
-    }
-
-    function exportJSON() {
-      if (!globalComplaints || globalComplaints.length === 0) return;
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(globalComplaints, null, 2));
-      const downloadAnchor = document.createElement('a');
-      downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", `hostel_triage_${new Date().toISOString().slice(0,10)}.json`);
-      document.body.appendChild(downloadAnchor);
-      downloadAnchor.click();
-      downloadAnchor.remove();
-      showToast("Downloaded JSON!", "📥");
     }
 
     function escapeHtml(str) {

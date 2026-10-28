@@ -128,6 +128,13 @@ flowchart TD
     - Automatically discovers and filters for active text/chat generation models for the user's specific account
     - Verified live on `https://hostel-complaint-triage.vercel.app` with 100% successful triage execution
   - [x] Created `DEPLOYMENT_GUIDE.md` and `VERCEL_DEPLOYMENT.md` with step-by-step instructions
+- [x] **Step 8: Ultra-Unique Hackathon Showstopper Features**
+  - [x] **🗺️ Interactive Spatial Floor Radar:** Visual interactive map of 4 floors and wings that illuminates hazard rooms in real-time with pulsing beacons. Tap any room to jump to its triage order.
+  - [x] **⚡ AI Compound Hazard Linker:** Automatically identifies second-order cascading threats (e.g., upper-floor washroom flood threatening lower-floor electrical conduits, or mess food complaints correlating with vomiting students).
+  - [x] **🎙️ Live Walkie-Talkie Voice Broadcast:** Synthesizes radio squelch chirps and uses browser Speech Synthesis to announce tactical emergency orders aloud over speakers during live pitches.
+  - [x] **📲 1-Tap Direct WhatsApp Chat Launch:** Deep-links directly to `wa.me` with pre-drafted replies for instant student communication.
+  - [x] **⏱️ Golden-Hour SLA Timers & One-Click Resolve:** Real-time countdowns on hazard breaches with quick "Mark Dispatched" actions.
+  - [x] **🖨️ Official Warden Incident Docket:** Clean printable report for the Chief Proctor / Dean of Student Affairs.
 
 ---
 

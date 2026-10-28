@@ -1,6 +1,6 @@
 """
 Hostel Complaint Triage AI Agent
-Powered by local Gemma 4 via Ollama
+Powered by local Gemma 4 via Ollama with Groq Cloud dual-mode fallback
 """
 
 import json
@@ -17,21 +17,25 @@ OLLAMA_BASE = os.environ.get("OLLAMA_HOST", "http://127.0.0.1:11434").rstrip("/"
 OLLAMA_API_URL = f"{OLLAMA_BASE}/api/generate"
 DEFAULT_MODEL = os.environ.get("GEMMA_MODEL", "gemma4:latest")
 
-SYSTEM_PROMPT = """You are an expert AI Hostel Operations Triage Agent.
+SYSTEM_PROMPT = """You are an expert AI Hostel Operations & Disaster Triage Agent.
 Given a raw chat dump of student complaints, parse each complaint into a structured JSON array of objects.
 
 Triage Rules:
 1. Extract EVERY individual complaint or issue mentioned in the chat.
 2. Extract the room or common area location (e.g. "B-204", "108", "Wing C Terrace"). If no room/location is mentioned, set "room": "Missing / Unknown".
-3. Classify category into: "Electrical & Fire", "Plumbing & Water", "Medical & Safety", "Infrastructure & Lift", "Internet & IT", "Food & Mess", "Discipline & Noise", "Other".
-4. Assign Urgency:
+3. Extract or infer:
+   - "floor": e.g. "Ground", "1st Floor", "2nd Floor", "3rd Floor", "4th Floor", "Terrace", or "Unknown"
+   - "wing": e.g. "Wing A", "Wing B", "Wing C", or "General"
+4. Classify category into: "Electrical & Fire", "Plumbing & Water", "Medical & Safety", "Infrastructure & Lift", "Internet & IT", "Food & Mess", "Discipline & Noise", "Cleanliness & Pest", "Other".
+5. Assign Urgency:
    - "Critical": Immediate danger to life, fire risk, live electrical shock, trapped in elevator, or high fever/vomiting medical emergency.
-   - "High": Safety hazard, smoking wire, flooding, locked in room, severe disruption.
+   - "High": Safety hazard, smoking wire, flooding, locked in room, acute injury.
    - "Medium": Wi-Fi down, AC breakdown, loud noise, water issue.
    - "Low": Food temperature, minor maintenance, loose fan regulator, minor disputes.
-5. Provide a crisp, concise "one_line_summary" (under 12 words) for 30-second warden skimming.
-6. Provide a concise "action_required" (under 10 words).
-7. Provide a "suggested_reply" (one short sentence for the student).
+6. Provide a crisp, concise "one_line_summary" (under 12 words) for 30-second warden skimming.
+7. Provide a concise "action_required" (under 10 words).
+8. Provide a "suggested_reply" (one short sentence for the student).
+9. Analyze cross-complaint connections and second-order hazards (e.g. water flooding on upper floor threatening lower floor electrical points, or mess food complaints correlating with vomiting students). Return in "cascading_risks".
 
 Respond ONLY with a valid JSON object in this format:
 {
@@ -40,12 +44,21 @@ Respond ONLY with a valid JSON object in this format:
       "id": 1,
       "student_raw": "...",
       "room": "B-204",
+      "floor": "2nd Floor",
+      "wing": "Wing B",
       "category": "Electrical & Fire",
       "urgency": "Critical",
       "urgency_reason": "Live sparks hazard",
       "one_line_summary": "B-204: Water leaking on fan switch with sparks",
       "action_required": "Cut power and send electrician",
       "suggested_reply": "Power is being disconnected. Please stay away from switch."
+    }
+  ],
+  "cascading_risks": [
+    {
+      "title": "Water seepage near electrical switchboards",
+      "description": "Flooding from 4th floor tap threatens electrical lines below.",
+      "threat_level": "Critical"
     }
   ]
 }
@@ -59,17 +72,98 @@ URGENCY_RANK = {
 }
 
 
+def infer_floor_and_wing(room_str: str) -> tuple:
+    """Heuristic helper to infer floor and wing from room strings like 'B-204' or '108'."""
+    room_lower = room_str.lower()
+    
+    # Infer Wing
+    wing = "General"
+    if "wing a" in room_lower:
+        wing = "Wing A"
+    elif "wing b" in room_lower or room_lower.startswith("b-") or room_lower.startswith("b"):
+        wing = "Wing B"
+    elif "wing c" in room_lower or room_lower.startswith("c-") or room_lower.startswith("c"):
+        wing = "Wing C"
+
+    # Infer Floor
+    floor = "Unknown"
+    digits = re.findall(r"\d+", room_str)
+    if "terrace" in room_lower:
+        floor = "Terrace"
+    elif "ground" in room_lower:
+        floor = "Ground Floor"
+    elif "4th floor" in room_lower:
+        floor = "4th Floor"
+    elif "3rd floor" in room_lower:
+        floor = "3rd Floor"
+    elif "2nd floor" in room_lower:
+        floor = "2nd Floor"
+    elif "1st floor" in room_lower:
+        floor = "1st Floor"
+    elif digits:
+        first_num = digits[0]
+        if len(first_num) == 3:
+            first_digit = first_num[0]
+            if first_digit == "1":
+                floor = "1st Floor"
+            elif first_digit == "2":
+                floor = "2nd Floor"
+            elif first_digit == "3":
+                floor = "3rd Floor"
+            elif first_digit == "4":
+                floor = "4th Floor"
+
+    return floor, wing
+
+
+def detect_cascading_risks(complaints: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """Deterministic intelligence engine that catches compound cross-complaint hazards."""
+    risks = []
+    
+    # Check 1: Upper-floor water + lower-floor/same-floor electrical
+    water_complaints = [c for c in complaints if "plumb" in c.get("category", "").lower() or "water" in c.get("one_line_summary", "").lower()]
+    electrical_complaints = [c for c in complaints if "electr" in c.get("category", "").lower() or "spark" in c.get("one_line_summary", "").lower() or "shock" in c.get("one_line_summary", "").lower()]
+
+    if water_complaints and electrical_complaints:
+        risks.append({
+            "title": "⚡ Compound Hydro-Electrical Hazard",
+            "description": f"Plumbing water leak ({water_complaints[0].get('room')}) detected alongside active electrical/spark issue ({electrical_complaints[0].get('room')}). Severe electrocution & conduit short-circuit risk.",
+            "threat_level": "Critical"
+        })
+
+    # Check 2: Mess food complaints + acute medical fever/vomiting
+    food_complaints = [c for c in complaints if "food" in c.get("category", "").lower() or "mess" in c.get("category", "").lower()]
+    medical_complaints = [c for c in complaints if "medic" in c.get("category", "").lower() or "vomit" in c.get("student_raw", "").lower() or "fever" in c.get("student_raw", "").lower()]
+
+    if food_complaints and medical_complaints:
+        risks.append({
+            "title": "🏥 Food Safety & Contamination Cluster",
+            "description": f"Mess dinner quality reports correlate with acute student medical distress ({medical_complaints[0].get('room')}). Inspect mess kitchen pantry immediately for spoilage.",
+            "threat_level": "High"
+        })
+
+    # Check 3: Jammed lock / lift entrapment
+    trapped = [c for c in complaints if "lift" in c.get("one_line_summary", "").lower() or "locked inside" in c.get("one_line_summary", "").lower() or "banging" in c.get("student_raw", "").lower()]
+    if trapped:
+        risks.append({
+            "title": "🚨 Student Entrapment Emergency",
+            "description": f"Human life trapped in {trapped[0].get('room')}. Dispatch security master-key / maintenance team before oxygen or panic levels escalate.",
+            "threat_level": "Critical"
+        })
+
+    return risks
+
+
 def clean_llm_json_response(raw_text: str) -> Dict[str, Any]:
     """
     Safely extract and parse JSON from LLM output.
     Includes a robust streaming recovery parser if output is truncated or malformed.
     """
     if not raw_text:
-        return {"complaints": []}
+        return {"complaints": [], "cascading_risks": []}
 
     raw_text = raw_text.strip()
     
-    # Strip markdown code fences if present
     fence_match = re.search(r"```(?:json)?\s*(.*?)\s*```", raw_text, re.DOTALL)
     if fence_match:
         raw_text = fence_match.group(1).strip()
@@ -99,7 +193,6 @@ def clean_llm_json_response(raw_text: str) -> Dict[str, Any]:
             pass
 
     # Attempt 3: Robust incremental parser for partial/truncated JSON
-    # Extracts all fully formed {...} objects within the complaints array
     complaints = []
     start_arr = raw_text.find("[")
     search_text = raw_text[start_arr + 1:] if start_arr != -1 else raw_text
@@ -162,14 +255,15 @@ def triage_hostel_chat(
     timeout: int = 120
 ) -> Dict[str, Any]:
     """
-    Takes a raw string of hostel chat messages and returns structured,
-    urgency-sorted complaints for the hostel warden.
+    Takes raw student chat messages and returns an executive triage board
+    with urgency ranks, room & floor coordinates, and cascading risk links.
     """
     if not chat_dump or not chat_dump.strip():
         return {
             "success": False,
             "error": "No chat dump provided. Please paste student chat messages.",
-            "complaints": []
+            "complaints": [],
+            "cascading_risks": []
         }
 
     full_prompt = f"{SYSTEM_PROMPT}\n\nInput Student Chat Dump:\n\"\"\"\n{chat_dump.strip()}\n\"\"\""
@@ -181,7 +275,7 @@ def triage_hostel_chat(
         "format": "json",
         "options": {
             "temperature": 0.1,
-            "num_predict": 4096  # Generous token limit to prevent mid-JSON cutoffs
+            "num_predict": 4096
         }
     }
 
@@ -202,11 +296,9 @@ def triage_hostel_chat(
                 if m_resp.ok:
                     available = [m["id"] for m in m_resp.json().get("data", [])]
                     logger.info(f"Available Groq models: {available}")
-                    # Filter for real generative text/chat models (exclude guardrails/whisper audio/speech)
                     chat_models = [m for m in available if not any(k in m.lower() for k in ["guard", "whisper", "orpheus", "speech"])]
                     
                     if groq_model not in chat_models:
-                        # Pick top preferred chat models supported on this Groq account
                         preferred = ["openai/gpt-oss-120b", "openai/gpt-oss-20b", "qwen/qwen3.8-27b", "allam-2-7b"]
                         for p in preferred:
                             if p in chat_models:
@@ -237,7 +329,6 @@ def triage_hostel_chat(
                 json=groq_payload,
                 timeout=timeout
             )
-            # If response_format causes an error on certain models, retry without it
             if res.status_code == 400 and "response_format" in res.text:
                 logger.warning("Retrying without response_format...")
                 groq_payload.pop("response_format", None)
@@ -270,12 +361,15 @@ def triage_hostel_chat(
         # Normalize structure
         if isinstance(parsed, list):
             complaints = parsed
+            llm_cascading = []
         elif isinstance(parsed, dict):
             complaints = parsed.get("complaints", parsed.get("items", []))
+            llm_cascading = parsed.get("cascading_risks", [])
             if not complaints and "raw_message" in parsed:
                 complaints = [parsed]
         else:
             complaints = []
+            llm_cascading = []
 
         # Validate and augment each complaint
         normalized_complaints: List[Dict[str, Any]] = []
@@ -293,10 +387,17 @@ def triage_hostel_chat(
             if is_missing_room:
                 room = "Missing / Unknown"
 
+            # Infer floor & wing coordinates for spatial radar
+            inferred_floor, inferred_wing = infer_floor_and_wing(room)
+            floor = item.get("floor") or inferred_floor
+            wing = item.get("wing") or inferred_wing
+
             normalized = {
                 "id": idx,
                 "student_raw": item.get("student_raw", item.get("raw_message", "")),
                 "room": room,
+                "floor": floor,
+                "wing": wing,
                 "has_missing_room": is_missing_room,
                 "category": item.get("category", "Other"),
                 "urgency": urgency,
@@ -316,6 +417,10 @@ def triage_hostel_chat(
         # Sort complaints strictly: Critical (4) -> High (3) -> Medium (2) -> Low (1)
         normalized_complaints.sort(key=lambda x: x["urgency_rank"], reverse=True)
 
+        # Generate cascading risk links (combining LLM insights + deterministic intelligence)
+        calculated_risks = detect_cascading_risks(normalized_complaints)
+        all_cascading = llm_cascading + [r for r in calculated_risks if not any(r["title"] == cr.get("title") for cr in llm_cascading)]
+
         # Compute summary metrics for 60-second skim header
         metrics = {
             "total": len(normalized_complaints),
@@ -324,13 +429,15 @@ def triage_hostel_chat(
             "medium": sum(1 for c in normalized_complaints if c["urgency"] == "Medium"),
             "low": sum(1 for c in normalized_complaints if c["urgency"] == "Low"),
             "missing_room": sum(1 for c in normalized_complaints if c["has_missing_room"]),
+            "cascading_count": len(all_cascading)
         }
 
         return {
             "success": True,
             "metrics": metrics,
             "complaints": normalized_complaints,
-            "model_used": model
+            "cascading_risks": all_cascading,
+            "model_used": model_used
         }
 
     except requests.exceptions.ConnectionError:
@@ -338,12 +445,14 @@ def triage_hostel_chat(
         return {
             "success": False,
             "error": "Cannot connect to local Ollama server at http://127.0.0.1:11434. Please ensure Ollama is running (`ollama serve`).",
-            "complaints": []
+            "complaints": [],
+            "cascading_risks": []
         }
     except Exception as e:
         logger.exception("Error during triage processing")
         return {
             "success": False,
             "error": f"Triage failed: {str(e)}",
-            "complaints": []
+            "complaints": [],
+            "cascading_risks": []
         }
