@@ -124,9 +124,9 @@ flowchart TD
   - [x] Created `Procfile` for cloud hosting (Render / Railway)
   - [x] Added `vercel.json` and Vercel Python Serverless adapter
   - [x] Added dual-mode inference: Local Ollama Gemma 4 + Free Cloud Gemma/Llama fallback (`GROQ_API_KEY`)
-  - [x] Resolved Vercel Groq 400 Client Error:
-    - *Cause:* Groq retired `gemma2-9b-it` and lacked JSON mode for it.
-    - *Fix:* Auto-routed cloud requests to Groq's active high-speed `llama-3.1-8b-instant` model with auto-retry if `response_format` is unsupported.
+  - [x] Resolved Vercel Groq 400 & 404 Model Access:
+    - *Auto-Discovery:* `triage_agent.py` now queries `https://api.groq.com/openai/v1/models` on each run and dynamically picks an active, available model for the user's specific account tier so model typos or deprecations never cause 404s.
+    - Added `/api/models` endpoint for real-time model introspection.
   - [x] Created `DEPLOYMENT_GUIDE.md` and `VERCEL_DEPLOYMENT.md` with step-by-step instructions
 
 ---

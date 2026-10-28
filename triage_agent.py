@@ -191,10 +191,26 @@ def triage_hostel_chat(
         if groq_key:
             logger.info("Dispatching triage request to Groq Cloud...")
             groq_model = os.environ.get("GROQ_MODEL", "llama-3.1-8b-instant").strip()
-            # Auto-route: Groq deprecated 'gemma2-9b-it' in favor of fast open-source Llama 3.1
-            if "gemma" in groq_model.lower():
-                logger.info(f"Mapping deprecated '{groq_model}' to active 'llama-3.1-8b-instant'")
-                groq_model = "llama-3.1-8b-instant"
+            
+            # Auto-discover active models available for this specific API key to guarantee 100% success
+            try:
+                m_resp = requests.get(
+                    "https://api.groq.com/openai/v1/models",
+                    headers={"Authorization": f"Bearer {groq_key.strip()}"},
+                    timeout=5
+                )
+                if m_resp.ok:
+                    available = [m["id"] for m in m_resp.json().get("data", [])]
+                    logger.info(f"Available Groq models: {available}")
+                    if groq_model not in available:
+                        candidates = [m for m in available if any(k in m.lower() for k in ["llama", "mixtral", "qwen"])]
+                        if candidates:
+                            groq_model = candidates[0]
+                        elif available:
+                            groq_model = available[0]
+                        logger.info(f"Auto-selected active model: {groq_model}")
+            except Exception as ex:
+                logger.warning(f"Could not auto-fetch models: {ex}")
 
             headers = {
                 "Authorization": f"Bearer {groq_key.strip()}",

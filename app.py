@@ -70,6 +70,23 @@ def health_check():
         }), 503
 
 
+@app.route("/api/models", methods=["GET"])
+def list_models():
+    """List available models for the active provider."""
+    groq_key = os.environ.get("GROQ_API_KEY")
+    if groq_key:
+        try:
+            r = requests.get(
+                "https://api.groq.com/openai/v1/models",
+                headers={"Authorization": f"Bearer {groq_key.strip()}"},
+                timeout=5
+            )
+            return jsonify(r.json())
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
+    return jsonify({"provider": "local_ollama", "note": "Set GROQ_API_KEY to see Groq models."})
+
+
 @app.route("/api/presets", methods=["GET"])
 def get_presets():
     """Return pre-configured realistic hostel chat datasets for fast live demo."""
