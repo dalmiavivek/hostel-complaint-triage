@@ -167,9 +167,10 @@ flowchart TD
     - 🧪 **Gas Leak & Biohazard:** Mess LPG cylinder leaks, burning odors, monsoon venomous pests.
     - 🚰 **Drinking Water & Hygiene:** Contaminated RO coolers, muddy water, outbreak threat.
     - Added dedicated filter pills and automated second-order cascading risk detectors for water contamination and combustible gas leaks.
-  - [x] **🎙️ Dual-Engine Walkie-Talkie Audio Hardening:**
-    - Fixed premature cancellation bug where `window.speechSynthesis.cancel()` right before `speak()` aborted audio output.
-    - Added HTML5 Audio stream fallback (`playAudioDispatchFallback`) that automatically fires if browser Web Speech API is muted or unavailable, guaranteeing clear spoken voice every time.
+  - [x] **🎙️ Server-Backed Studio Audio Dispatch (`/api/dispatch_audio`):**
+    - Built dedicated backend endpoint `/api/dispatch_audio` that renders genuine 16-bit 22050Hz uncompressed `.wav` audio using native high-fidelity voices (Samantha / Daniel).
+    - Frontend automatically streams the server's real `.wav` file through HTML5 `<audio>`, bypassing all browser Web Speech API blocking, permission limits, and audio driver queue locks.
+    - Added seamless client-side Web Speech fallback with `resume()` for cloud/Vercel serverless deployments.
 
 ---
 

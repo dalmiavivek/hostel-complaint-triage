@@ -3,9 +3,12 @@ Hostel Complaint Triage - Flask Web Application
 """
 
 import os
+import sys
 import json
 import logging
-from flask import Flask, render_template, request, jsonify, Response
+import subprocess
+import tempfile
+from flask import Flask, render_template, request, jsonify, Response, send_file
 import requests
 from triage_agent import triage_hostel_chat, DEFAULT_MODEL, OLLAMA_BASE
 
@@ -157,6 +160,39 @@ def format_whatsapp():
 
     formatted = "\n".join(lines)
     return jsonify({"formatted_text": formatted})
+
+
+@app.route("/api/dispatch_audio", methods=["POST"])
+def dispatch_audio():
+    """Synthesize high-fidelity native audio dispatch for Walkie-Talkie on macOS."""
+    data = request.get_json() or {}
+    text = data.get("text", "")
+    voice = data.get("voice", "Samantha")
+    if not text:
+        return jsonify({"error": "No text provided"}), 400
+
+    # On macOS, use native high-fidelity audio synthesis to produce a genuine .wav audio file
+    if sys.platform == "darwin":
+        try:
+            safe_text = text.replace('"', '').replace('$', '').replace('`', '').strip()
+            if len(safe_text) > 320:
+                safe_text = safe_text[:320] + "... Over and out."
+
+            out_wav = os.path.join(tempfile.gettempdir(), f"walkie_dispatch_{os.getpid()}.wav")
+            cmd = ["say", "-v", voice, "-o", out_wav, "--data-format=LEI16@22050", safe_text]
+            res = subprocess.run(cmd, capture_output=True, text=True, timeout=8)
+            if res.returncode == 0 and os.path.exists(out_wav) and os.path.getsize(out_wav) > 1000:
+                return send_file(out_wav, mimetype="audio/wav")
+
+            # Fallback to default say voice if chosen voice is not installed
+            cmd_default = ["say", "-o", out_wav, "--data-format=LEI16@22050", safe_text]
+            res2 = subprocess.run(cmd_default, capture_output=True, text=True, timeout=8)
+            if res2.returncode == 0 and os.path.exists(out_wav) and os.path.getsize(out_wav) > 1000:
+                return send_file(out_wav, mimetype="audio/wav")
+        except Exception as e:
+            logger.warning(f"Native audio synthesis error: {e}")
+
+    return jsonify({"fallback_to_browser": True})
 
 
 if __name__ == "__main__":

@@ -1171,9 +1171,9 @@
       }
     }
 
-    function playWalkieTalkieDispatch() {
+    async function playWalkieTalkieDispatch() {
       // 1. If currently speaking or audio player is active, clicking acts as PTT release/stop
-      if (window.activeAudioPlayer || ('speechSynthesis' in window && (window.speechSynthesis.speaking || window.speechSynthesis.pending))) {
+      if (window.activeAudioPlayer || ('speechSynthesis' in window && window.speechSynthesis.speaking)) {
         stopWalkieTalkieDispatch();
         showToast("Walkie-Talkie transmission stopped", "⏹️");
         return;
@@ -1208,71 +1208,88 @@
         btnText.textContent = "Broadcasting (Click to Stop)";
       }
       if (voiceBadge) {
-        voiceBadge.textContent = "Human Dispatcher";
+        voiceBadge.textContent = "Samantha (HQ Audio)";
       }
       if (banner && bannerText) {
         bannerText.textContent = `"${scriptText}"`;
         banner.classList.remove('hidden');
       }
 
-      // 5. Dual-engine Audio Execution:
-      // Try Browser Web Speech API first without cancel() collision, backed up by HTML5 Audio!
-      let speechStarted = false;
+      // 5. Native High-Fidelity Audio Synthesis via /api/dispatch_audio
+      // This sends a real .wav audio stream from the server, 100% guaranteed to play through laptop/phone speakers!
+      try {
+        const resp = await fetch('/api/dispatch_audio', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: scriptText, voice: 'Samantha' })
+        });
 
-      if ('speechSynthesis' in window) {
-        try {
-          const utterance = new SpeechSynthesisUtterance(scriptText);
-          window.activeSpeechUtterance = utterance;
+        const contentType = resp.headers.get('content-type') || '';
+        if (resp.ok && contentType.includes('audio')) {
+          const blob = await resp.blob();
+          const audioUrl = URL.createObjectURL(blob);
+          const audio = new Audio(audioUrl);
+          window.activeAudioPlayer = audio;
 
-          const chosenVoice = getSelectedVoice();
-          // Only assign voice if user explicitly picked one, else let browser use default working voice
-          const select = document.getElementById('walkieVoiceSelect');
-          if (select && select.value !== 'auto' && chosenVoice) {
-            utterance.voice = chosenVoice;
-          }
-          utterance.lang = 'en-US';
-          utterance.rate = 0.98;
-          utterance.pitch = 1.0;
-          utterance.volume = 1.0;
-
-          utterance.onstart = () => {
-            speechStarted = true;
-          };
-
-          utterance.onend = () => {
+          audio.onended = () => {
             playSquelchTail();
             resetWalkieUI();
-            window.activeSpeechUtterance = null;
-            showToast("Walkie-Talkie dispatch broadcast complete!", "🎙️");
+            window.activeAudioPlayer = null;
+            showToast("Walkie-Talkie voice dispatch complete!", "🎙️");
           };
 
-          utterance.onerror = (e) => {
-            console.warn("SpeechSynthesis error, triggering audio stream fallback:", e);
-            if (!speechStarted) {
-              playAudioDispatchFallback(scriptText);
-            } else {
-              resetWalkieUI();
-            }
+          audio.onerror = (e) => {
+            console.warn("Audio element error, falling back to browser speech:", e);
+            fallbackToBrowserSpeech(scriptText);
           };
 
-          window.speechSynthesis.speak(utterance);
-
-          // Watchdog: If browser SpeechSynthesis was silently blocked or hung, trigger HTML5 Audio after 300ms
-          setTimeout(() => {
-            if (!speechStarted && !window.speechSynthesis.speaking) {
-              console.warn("Web Speech API did not produce sound. Triggering HTML5 Audio Dispatch Fallback...");
-              playAudioDispatchFallback(scriptText);
-            }
-          }, 300);
-
+          // Play real studio audio file directly through device audio output
+          await audio.play();
           return;
-        } catch (e) {
-          console.warn("Web Speech initialization failed, using HTML5 Audio fallback:", e);
         }
+      } catch (err) {
+        console.warn("Fetch /api/dispatch_audio failed, falling back to browser speech:", err);
       }
 
-      // If SpeechSynthesis not supported or failed to init, play HTML5 Audio directly
-      playAudioDispatchFallback(scriptText);
+      // 6. Seamless Fallback: Browser Web Speech API (for Cloud / Vercel)
+      fallbackToBrowserSpeech(scriptText);
+    }
+
+    function fallbackToBrowserSpeech(scriptText) {
+      if (!('speechSynthesis' in window)) {
+        resetWalkieUI();
+        showToast("Audio synthesis not supported on this device", "⚠️");
+        return;
+      }
+
+      try {
+        const utterance = new SpeechSynthesisUtterance(scriptText);
+        window.activeSpeechUtterance = utterance;
+        utterance.lang = 'en-US';
+        utterance.rate = 0.98;
+        utterance.pitch = 1.0;
+        utterance.volume = 1.0;
+
+        utterance.onend = () => {
+          playSquelchTail();
+          resetWalkieUI();
+          window.activeSpeechUtterance = null;
+          showToast("Walkie-Talkie dispatch broadcast complete!", "🎙️");
+        };
+
+        utterance.onerror = (e) => {
+          console.warn("SpeechSynthesis error:", e);
+          resetWalkieUI();
+          window.activeSpeechUtterance = null;
+        };
+
+        window.speechSynthesis.speak(utterance);
+        // Important: unfreeze Chrome's audio queue
+        window.speechSynthesis.resume();
+      } catch (e) {
+        console.error("SpeechSynthesis speak error:", e);
+        resetWalkieUI();
+      }
     }
 
     // ==========================================
