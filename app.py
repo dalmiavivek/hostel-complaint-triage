@@ -8,6 +8,8 @@ import json
 import logging
 import subprocess
 import tempfile
+import uuid
+import time
 from flask import Flask, render_template, request, jsonify, Response, send_file
 import requests
 from triage_agent import triage_hostel_chat, DEFAULT_MODEL, OLLAMA_BASE
@@ -178,7 +180,7 @@ def dispatch_audio():
             if len(safe_text) > 320:
                 safe_text = safe_text[:320] + "... Over and out."
 
-            out_wav = os.path.join(tempfile.gettempdir(), f"walkie_dispatch_{os.getpid()}.wav")
+            out_wav = os.path.join(tempfile.gettempdir(), f"walkie_dispatch_{os.getpid()}_{uuid.uuid4().hex[:6]}.wav")
             cmd = ["say", "-v", voice, "-o", out_wav, "--data-format=LEI16@22050", safe_text]
             res = subprocess.run(cmd, capture_output=True, text=True, timeout=8)
             if res.returncode == 0 and os.path.exists(out_wav) and os.path.getsize(out_wav) > 1000:

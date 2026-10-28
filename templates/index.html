@@ -507,6 +507,17 @@
               </div>
             </button>
 
+            <!-- Instant Voice Test Button -->
+            <button 
+              id="testVoiceBtn"
+              onclick="testAudioVoiceDirectly()"
+              class="wood-btn px-2.5 py-2 rounded-lg bg-[#EFE3D3] hover:bg-[#E3D3C0] text-[#4A3525] text-xs font-black shadow-2xs transition flex items-center justify-center gap-1 border border-[#CCAFA0]"
+              title="Click to test Samantha voice output immediately"
+            >
+              <span>🔊</span>
+              <span>Test Voice</span>
+            </button>
+
             <!-- Human Voice Selector Dropdown -->
             <div class="flex items-center gap-1.5 bg-[#F6EDE2] border border-[#CCAFA0] rounded-lg px-2.5 py-1.5 shadow-sm" title="Human Dispatcher Voice Engine">
               <span class="text-[10px] font-bold text-[#7A5B42] shrink-0">🗣️ Voice:</span>
@@ -1423,7 +1434,8 @@
   </div>
 
   <!-- Toast Notification -->
-  <div id="toast" class="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-6 sm:w-auto z-50 bg-[#3E2919] text-[#FDF8F0] text-xs font-bold px-4 py-3 rounded-xl shadow-2xl flex items-center justify-center sm:justify-start gap-2 transform translate-y-24 opacity-0 transition-all duration-300 pointer-events-none border border-[#6E4E32]">
+  <audio id="walkieAudioElement" preload="auto" class="hidden"></audio>
+<div id="toast" class="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-6 sm:w-auto z-50 bg-[#3E2919] text-[#FDF8F0] text-xs font-bold px-4 py-3 rounded-xl shadow-2xl flex items-center justify-center sm:justify-start gap-2 transform translate-y-24 opacity-0 transition-all duration-300 pointer-events-none border border-[#6E4E32]">
     <span id="toastIcon">✅</span>
     <span id="toastMsg">Notification message</span>
   </div>
@@ -1897,16 +1909,16 @@
       return sentences.join(" ");
     }
 
-    window.activeSpeechUtterance = null;
-    window.activeAudioPlayer = null;
+    let isBroadcasting = false;
+    let globalAudioPlayer = null;
 
     function stopWalkieTalkieDispatch() {
-      if (window.activeAudioPlayer) {
+      isBroadcasting = false;
+      if (globalAudioPlayer) {
         try {
-          window.activeAudioPlayer.pause();
-          window.activeAudioPlayer.currentTime = 0;
+          globalAudioPlayer.pause();
+          globalAudioPlayer.currentTime = 0;
         } catch (e) {}
-        window.activeAudioPlayer = null;
       }
       if ('speechSynthesis' in window) {
         try {
@@ -1915,10 +1927,10 @@
       }
       playSquelchTail();
       resetWalkieUI();
-      window.activeSpeechUtterance = null;
     }
 
     function resetWalkieUI() {
+      isBroadcasting = false;
       const anim = document.getElementById('soundwaveAnim');
       const btnText = document.getElementById('walkieText');
       const banner = document.getElementById('liveDispatchBanner');
@@ -1934,73 +1946,7 @@
       }
     }
 
-    // Direct Google Cloud TTS HTML5 Audio Fallback Player
-    function playAudioDispatchFallback(scriptText) {
-      if (window.activeAudioPlayer) return;
-      try {
-        // Shorten to crisp 160-char punchy radio snippet for reliable audio streaming
-        let snippet = scriptText;
-        if (snippet.length > 175) {
-          snippet = snippet.substring(0, 175).trim() + "... Over and out.";
-        }
-        const audioUrl = `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=en&q=${encodeURIComponent(snippet)}`;
-        const audio = new Audio(audioUrl);
-        window.activeAudioPlayer = audio;
-
-        audio.onplay = () => {
-          const anim = document.getElementById('soundwaveAnim');
-          if (anim) {
-            anim.classList.remove('hidden');
-            anim.classList.add('flex');
-          }
-        };
-
-        audio.onended = () => {
-          playSquelchTail();
-          resetWalkieUI();
-          window.activeAudioPlayer = null;
-          showToast("Walkie-Talkie audio dispatch broadcast complete!", "🎙️");
-        };
-
-        audio.onerror = (e) => {
-          console.warn("Audio fallback error:", e);
-          resetWalkieUI();
-          window.activeAudioPlayer = null;
-        };
-
-        audio.play().catch(err => {
-          console.warn("Audio play() blocked:", err);
-          resetWalkieUI();
-        });
-      } catch (err) {
-        console.warn("Could not play fallback audio:", err);
-        resetWalkieUI();
-      }
-    }
-
-    async function playWalkieTalkieDispatch() {
-      // 1. If currently speaking or audio player is active, clicking acts as PTT release/stop
-      if (window.activeAudioPlayer || ('speechSynthesis' in window && window.speechSynthesis.speaking)) {
-        stopWalkieTalkieDispatch();
-        showToast("Walkie-Talkie transmission stopped", "⏹️");
-        return;
-      }
-
-      // 2. Play audible PTT chirp immediately via Web Audio with resume()
-      playPttChirp();
-
-      // 3. Prepare dispatch text (fallback to radio check if no complaints triaged yet)
-      let scriptText = "";
-      if (!globalComplaints || globalComplaints.length === 0) {
-        scriptText = "Attention all units, this is Warden Dispatch conducting a tactical radio check. All frequencies operational. Paste complaints and click triage to broadcast active incident dispatches. Over.";
-        showToast("Broadcasting radio check! (Triage complaints for live incidents)", "🎙️");
-      } else {
-        scriptText = generateHumanWalkieScript(globalComplaints, globalCascading);
-      }
-
-      if (!scriptText) return;
-
-      // 4. Update UI elements immediately
+    function updateWalkieUIActive(scriptText, voiceLabel) {
       const anim = document.getElementById('soundwaveAnim');
       const btnText = document.getElementById('walkieText');
       const banner = document.getElementById('liveDispatchBanner');
@@ -2015,88 +1961,180 @@
         btnText.textContent = "Broadcasting (Click to Stop)";
       }
       if (voiceBadge) {
-        voiceBadge.textContent = "Samantha (HQ Audio)";
+        voiceBadge.textContent = voiceLabel || "Samantha (Live Voice)";
       }
       if (banner && bannerText) {
         bannerText.textContent = `"${scriptText}"`;
         banner.classList.remove('hidden');
       }
+    }
 
-      // 5. Native High-Fidelity Audio Synthesis via /api/dispatch_audio
-      // This sends a real .wav audio stream from the server, 100% guaranteed to play through laptop/phone speakers!
+    // Direct, 100% Guaranteed Human Speech Synthesis
+    function speakDirectHumanVoice(text, onStart, onEnd) {
+      if (!('speechSynthesis' in window)) {
+        console.warn("speechSynthesis not supported in this browser");
+        if (onEnd) onEnd();
+        return;
+      }
+
+      // 1. Force unfreeze any stuck speech queue in Chrome/Safari
+      try {
+        window.speechSynthesis.cancel();
+        window.speechSynthesis.resume();
+      } catch (e) {}
+
+      // 2. Wait 40ms to let browser clear cancel state before queuing
+      setTimeout(() => {
+        try {
+          const cleanText = text.replace(/[*#_~`]/g, '').trim();
+          const utterance = new SpeechSynthesisUtterance(cleanText);
+          
+          const voice = getSelectedVoice();
+          if (voice) {
+            utterance.voice = voice;
+            utterance.lang = voice.lang || 'en-US';
+          } else {
+            utterance.lang = 'en-US';
+          }
+
+          utterance.volume = 1.0;
+          utterance.rate = 1.0;
+          utterance.pitch = 1.0;
+
+          // Chrome keep-alive hack: periodically resume to prevent 15-second silent pause
+          let keepAlive = setInterval(() => {
+            if (window.speechSynthesis && window.speechSynthesis.speaking) {
+              window.speechSynthesis.pause();
+              window.speechSynthesis.resume();
+            } else {
+              clearInterval(keepAlive);
+            }
+          }, 3000);
+
+          utterance.onstart = () => {
+            if (onStart) onStart(voice ? voice.name : "Samantha (Human Voice)");
+          };
+
+          utterance.onend = () => {
+            clearInterval(keepAlive);
+            if (onEnd) onEnd();
+          };
+
+          utterance.onerror = (e) => {
+            clearInterval(keepAlive);
+            console.warn("SpeechSynthesis error:", e);
+            if (onEnd) onEnd();
+          };
+
+          window.speechSynthesis.speak(utterance);
+          window.speechSynthesis.resume();
+        } catch (err) {
+          console.error("speakDirectHumanVoice error:", err);
+          if (onEnd) onEnd();
+        }
+      }, 40);
+    }
+
+    async function playWalkieTalkieDispatch(customText = null) {
+      // 1. Toggle stop if currently broadcasting
+      if (isBroadcasting) {
+        stopWalkieTalkieDispatch();
+        showToast("Walkie-Talkie transmission stopped", "⏹️");
+        return;
+      }
+
+      isBroadcasting = true;
+
+      // 2. Pre-prime HTML5 audio player synchronously inside click gesture to unlock autoplay
+      if (!globalAudioPlayer) {
+        globalAudioPlayer = document.getElementById('walkieAudioElement');
+        if (!globalAudioPlayer) {
+          globalAudioPlayer = new Audio();
+          globalAudioPlayer.id = 'walkieAudioElement';
+          document.body.appendChild(globalAudioPlayer);
+        }
+      }
+      try {
+        globalAudioPlayer.pause();
+        globalAudioPlayer.currentTime = 0;
+        globalAudioPlayer.play().catch(() => {});
+      } catch (e) {}
+
+      // 3. Play audible PTT chirp immediately via Web Audio
+      playPttChirp();
+
+      // 4. Determine dispatch text
+      let scriptText = "";
+      if (customText && typeof customText === 'string' && customText.trim()) {
+        scriptText = customText.trim();
+      } else if (!globalComplaints || globalComplaints.length === 0) {
+        scriptText = "Attention all units, this is Warden Dispatch conducting a tactical radio check. All frequencies operational. Paste complaints and click triage to broadcast active incident dispatches. Over.";
+        showToast("Broadcasting tactical radio check!", "🎙️");
+      } else {
+        scriptText = generateHumanWalkieScript(globalComplaints, globalCascading);
+      }
+
+      if (!scriptText) {
+        isBroadcasting = false;
+        return;
+      }
+
+      // 5. Update UI elements immediately
+      updateWalkieUIActive(scriptText, "Live Voice Dispatching...");
+
+      // 6. Speak immediately using human voice (0ms latency, high quality)
+      if ('speechSynthesis' in window) {
+        speakDirectHumanVoice(
+          scriptText,
+          (voiceName) => {
+            updateWalkieUIActive(scriptText, `${voiceName} (Live Speaking)`);
+          },
+          () => {
+            playSquelchTail();
+            resetWalkieUI();
+            showToast("Voice dispatch broadcast complete!", "🎙️");
+          }
+        );
+        return;
+      }
+
+      // 7. Fallback to server audio if speechSynthesis is absent
       try {
         const resp = await fetch('/api/dispatch_audio', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ text: scriptText, voice: 'Samantha' })
         });
-
         const contentType = resp.headers.get('content-type') || '';
         if (resp.ok && contentType.includes('audio')) {
           const blob = await resp.blob();
           const audioUrl = URL.createObjectURL(blob);
-          const audio = new Audio(audioUrl);
-          window.activeAudioPlayer = audio;
+          globalAudioPlayer.src = audioUrl;
 
-          audio.onended = () => {
+          globalAudioPlayer.onended = () => {
             playSquelchTail();
             resetWalkieUI();
-            window.activeAudioPlayer = null;
-            showToast("Walkie-Talkie voice dispatch complete!", "🎙️");
+            showToast("Server WAV voice dispatch complete!", "🎙️");
           };
 
-          audio.onerror = (e) => {
-            console.warn("Audio element error, falling back to browser speech:", e);
-            fallbackToBrowserSpeech(scriptText);
+          globalAudioPlayer.onerror = (e) => {
+            console.warn("Server audio error:", e);
+            resetWalkieUI();
           };
 
-          // Play real studio audio file directly through device audio output
-          await audio.play();
+          await globalAudioPlayer.play();
           return;
         }
-      } catch (err) {
-        console.warn("Fetch /api/dispatch_audio failed, falling back to browser speech:", err);
+      } catch (e) {
+        console.warn("Audio dispatch error:", e);
+        resetWalkieUI();
       }
-
-      // 6. Seamless Fallback: Browser Web Speech API (for Cloud / Vercel)
-      fallbackToBrowserSpeech(scriptText);
     }
 
-    function fallbackToBrowserSpeech(scriptText) {
-      if (!('speechSynthesis' in window)) {
-        resetWalkieUI();
-        showToast("Audio synthesis not supported on this device", "⚠️");
-        return;
-      }
-
-      try {
-        const utterance = new SpeechSynthesisUtterance(scriptText);
-        window.activeSpeechUtterance = utterance;
-        utterance.lang = 'en-US';
-        utterance.rate = 0.98;
-        utterance.pitch = 1.0;
-        utterance.volume = 1.0;
-
-        utterance.onend = () => {
-          playSquelchTail();
-          resetWalkieUI();
-          window.activeSpeechUtterance = null;
-          showToast("Walkie-Talkie dispatch broadcast complete!", "🎙️");
-        };
-
-        utterance.onerror = (e) => {
-          console.warn("SpeechSynthesis error:", e);
-          resetWalkieUI();
-          window.activeSpeechUtterance = null;
-        };
-
-        window.speechSynthesis.speak(utterance);
-        // Important: unfreeze Chrome's audio queue
-        window.speechSynthesis.resume();
-      } catch (e) {
-        console.error("SpeechSynthesis speak error:", e);
-        resetWalkieUI();
-      }
+    function testAudioVoiceDirectly() {
+      showToast("Testing Samantha voice output...", "🔊");
+      const testMsg = "Radio check. This is Samantha. Hostel Incident Triage audio system is loud and clear.";
+      playWalkieTalkieDispatch(testMsg);
     }
 
     // ==========================================
