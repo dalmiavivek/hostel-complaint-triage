@@ -135,9 +135,16 @@ flowchart TD
     - Replaced robotic database readout with natural human dispatcher phraseology (*"Attention all hostel ground crew, this is Warden Dispatch on priority channel..."*).
     - Intelligent Neural/Natural Voice Selector: Automatically identifies and prioritizes high-fidelity human voices (`Samantha`, `Daniel`, `Google US English`, `Microsoft Christopher Online Natural`) via `speechSynthesis.getVoices()`, filtering out robotic and toy voices.
     - Added sleek in-UI Voice Selector dropdown so wardens and presenters can select or preview different natural human dispatcher voices.
-    - Web Audio acoustic simulation: Motorola MDC1200 2-tone PTT opening chirp + authentic 70ms mic-release bandpass squelch static pop on end (`onend`).
+    - Web Audio acoustic simulation: Motorola MDC1200 2-tone PTT opening chirp + authentic 80ms mic-release bandpass squelch static pop on end (`onend`).
+    - **Audio Playback Hardening & Fixes:**
+      - Explicit `ctx.resume()` in `getAudioContext()` on user gesture to avoid browser audio suspension.
+      - Synchronous invocation of `window.speechSynthesis.speak(utterance)` within the user click handler (eliminating `setTimeout` that triggered Safari/iOS user-activation expiration).
+      - Chrome TTS queue unfreezer (`window.speechSynthesis.resume()` following `.cancel()`).
+      - V8 Garbage Collection protection via persistent `window.activeSpeechUtterance`.
+      - Instant radio check broadcast if clicked prior to triaging, ensuring sound always plays.
+      - Automatic error recovery fallback to standard system TTS if a specific voice asset fails to load.
     - Real-time Live Dispatch Subtitle banner with instant Stop/PTT release toggle.
-    - Speech prosody & pronunciation tuning: Rate 0.96 for natural human pacing, pitch 1.0 for authentic vocal formants, and natural expansion of room numbers (`Room B 204` instead of `B minus 204`).
+    - Speech prosody & pronunciation tuning: Rate 0.98 for natural human pacing, pitch 1.0 for authentic vocal formants, and natural expansion of room numbers (`Room B 204` instead of `B minus 204`).
   - [x] **📲 1-Tap Direct WhatsApp Chat Launch:** Deep-links directly to `wa.me` with pre-drafted replies for instant student communication.
   - [x] **⏱️ Golden-Hour SLA Timers & One-Click Resolve:** Real-time countdowns on hazard breaches with quick "Mark Dispatched" actions.
   - [x] **🖨️ Official Warden Incident Docket:** Clean printable report for the Chief Proctor / Dean of Student Affairs.
