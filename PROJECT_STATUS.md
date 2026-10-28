@@ -131,7 +131,13 @@ flowchart TD
 - [x] **Step 8: Ultra-Unique Hackathon Showstopper Features**
   - [x] **🗺️ Interactive Spatial Floor Radar:** Visual interactive map of 4 floors and wings that illuminates hazard rooms in real-time with pulsing beacons. Tap any room to jump to its triage order.
   - [x] **⚡ AI Compound Hazard Linker:** Automatically identifies second-order cascading threats (e.g., upper-floor washroom flood threatening lower-floor electrical conduits, or mess food complaints correlating with vomiting students).
-  - [x] **🎙️ Live Walkie-Talkie Voice Broadcast:** Synthesizes radio squelch chirps and uses browser Speech Synthesis to announce tactical emergency orders aloud over speakers during live pitches.
+  - [x] **🎙️ Humanized Live Walkie-Talkie Voice Broadcast:**
+    - Replaced robotic database readout with natural human dispatcher phraseology (*"Attention all hostel ground crew, this is Warden Dispatch on priority channel..."*).
+    - Intelligent Neural/Natural Voice Selector: Automatically identifies and prioritizes high-fidelity human voices (`Samantha`, `Daniel`, `Google US English`, `Microsoft Christopher Online Natural`) via `speechSynthesis.getVoices()`, filtering out robotic and toy voices.
+    - Added sleek in-UI Voice Selector dropdown so wardens and presenters can select or preview different natural human dispatcher voices.
+    - Web Audio acoustic simulation: Motorola MDC1200 2-tone PTT opening chirp + authentic 70ms mic-release bandpass squelch static pop on end (`onend`).
+    - Real-time Live Dispatch Subtitle banner with instant Stop/PTT release toggle.
+    - Speech prosody & pronunciation tuning: Rate 0.96 for natural human pacing, pitch 1.0 for authentic vocal formants, and natural expansion of room numbers (`Room B 204` instead of `B minus 204`).
   - [x] **📲 1-Tap Direct WhatsApp Chat Launch:** Deep-links directly to `wa.me` with pre-drafted replies for instant student communication.
   - [x] **⏱️ Golden-Hour SLA Timers & One-Click Resolve:** Real-time countdowns on hazard breaches with quick "Mark Dispatched" actions.
   - [x] **🖨️ Official Warden Incident Docket:** Clean printable report for the Chief Proctor / Dean of Student Affairs.
