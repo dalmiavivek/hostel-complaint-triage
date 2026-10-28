@@ -194,6 +194,16 @@ flowchart TD
     - Comprehensive hostel incident bylaws: misuse fines (₹5,000), SLA table, nocturnal quiet hours dispatch, and warden emergency room entry rights.
   - [x] **🔒 Campus Data Fortress & Sovereign Privacy View (`#view-privacy`):**
     - Air-gap validation console, 127.0.0.1 loopback confirmation, zero cloud egress telemetry proof, and FERPA / DPDP Act 2023 compliance.
+- [x] **Step 11: Vercel-Inspired Plain White Minimalist Theme & Lucide Icon Suite**
+  - [x] **⚪ Vercel Geist Light / Plain White Design System:**
+    - Replaced the previous wood-grain and dark palette with a crisp, ultra-modern Vercel-style plain white theme (`#FAFAFA` canvas, pure `#FFFFFF` cards, `#EAEAEA` / `#E4E4E7` borders).
+    - Signature solid black primary triage button (`bg-black text-white hover:bg-zinc-800 border border-black shadow-xs`).
+    - Clean white Left Sidebar with glowing emerald active indicator (`#10B981`) and muted zinc inactive states.
+    - Segmented controls, clean kanban columns (`bg-zinc-50`), and high-contrast developer terminal in `#view-simulator`.
+  - [x] **✨ Lucide Icons Integration:**
+    - Migrated raw system emojis to clean, high-precision SVG Lucide icons via `<script src="https://unpkg.com/lucide@latest"></script>`.
+    - Integrated Lucide icons across navigation categories (`home`, `play-circle`, `shield-check`, `terminal`, `file-text`, `lock`), action buttons (`radio`, `volume-2`, `send`, `printer`, `zap`, `upload`), metric counters, and dynamic complaint cards.
+    - Automated `lucide.createIcons()` on DOM load, dynamic filter switching, and real-time triage rendering.
 
 ---
 
