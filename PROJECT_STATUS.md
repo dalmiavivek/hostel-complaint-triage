@@ -194,16 +194,34 @@ flowchart TD
     - Comprehensive hostel incident bylaws: misuse fines (₹5,000), SLA table, nocturnal quiet hours dispatch, and warden emergency room entry rights.
   - [x] **🔒 Campus Data Fortress & Sovereign Privacy View (`#view-privacy`):**
     - Air-gap validation console, 127.0.0.1 loopback confirmation, zero cloud egress telemetry proof, and FERPA / DPDP Act 2023 compliance.
-- [x] **Step 11: Vercel-Inspired Plain White Minimalist Theme & Lucide Icon Suite**
+- [x] **Step 11: Vercel-Inspired Plain White Minimalist Theme & Left Navigation**
   - [x] **⚪ Vercel Geist Light / Plain White Design System:**
     - Replaced the previous wood-grain and dark palette with a crisp, ultra-modern Vercel-style plain white theme (`#FAFAFA` canvas, pure `#FFFFFF` cards, `#EAEAEA` / `#E4E4E7` borders).
     - Signature solid black primary triage button (`bg-black text-white hover:bg-zinc-800 border border-black shadow-xs`).
     - Clean white Left Sidebar with glowing emerald active indicator (`#10B981`) and muted zinc inactive states.
     - Segmented controls, clean kanban columns (`bg-zinc-50`), and high-contrast developer terminal in `#view-simulator`.
-  - [x] **✨ Lucide Icons Integration:**
-    - Migrated raw system emojis to clean, high-precision SVG Lucide icons via `<script src="https://unpkg.com/lucide@latest"></script>`.
-    - Integrated Lucide icons across navigation categories (`home`, `play-circle`, `shield-check`, `terminal`, `file-text`, `lock`), action buttons (`radio`, `volume-2`, `send`, `printer`, `zap`, `upload`), metric counters, and dynamic complaint cards.
-    - Automated `lucide.createIcons()` on DOM load, dynamic filter switching, and real-time triage rendering.
+- [x] **Step 12: Comprehensive Custom-Colored Lucide Icon Suite & Zero Default Emoji Architecture**
+  - [x] **🎨 Lucide Custom Color System (https://lucide.dev/icons/):**
+    - Removed 100% of visible system emojis across every single UI component, replacing them with crisp SVG Lucide icons styled with custom semantic colors and subtle tinted badge containers:
+      - **Critical / Life-Safety / Code Red**: `siren` & `alert-octagon` in vibrant `#E11D48` rose (`text-rose-600 bg-rose-50 border-rose-200 animate-pulse`).
+      - **High Urgency / Hazard Warning**: `alert-triangle` in `#D97706` amber (`text-amber-600 bg-amber-50 border-amber-200`).
+      - **Electrical & Sparking**: `zap` in vibrant electric amber (`text-amber-500 bg-amber-50 border-amber-200`).
+      - **Plumbing & Hydro Leak**: `droplet` in sky-blue (`text-sky-500 bg-sky-50 border-sky-200`).
+      - **Potable Water & TDS**: `glass-water` in bright cyan (`text-cyan-500 bg-cyan-50 border-cyan-200`).
+      - **Medical & Casualty**: `heart-pulse` in medical rose (`text-rose-500 bg-rose-50 border-rose-200`).
+      - **Security & Patrol**: `shield` & `shield-check` in tactical blue and emerald (`text-blue-500 bg-blue-50 border-blue-200`).
+      - **Biohazard & Gas**: `flask-conical` in violet-purple (`text-purple-500 bg-purple-50 border-purple-200`).
+      - **CCTV Camera**: `video` in high-tech cyan (`text-cyan-400 bg-cyan-500/10 border-cyan-500/30`).
+      - **Location & Floor Map**: `map-pin` in slate-zinc (`text-zinc-500 bg-zinc-100 border-zinc-200`).
+      - **SLA Golden Hour Clock**: `clock` in rose and zinc (`text-rose-500` / `text-zinc-400`).
+      - **Communication & WhatsApp**: `message-square` in WhatsApp emerald (`text-emerald-500 bg-emerald-50 border-emerald-200`).
+      - **Resolved & Verified**: `check-circle` & `check-check` in emerald (`text-emerald-600 bg-emerald-50 border-emerald-200`).
+  - [x] **🚨 Crisis Simulator Telemetry Overhaul:**
+    - Replaced raw console emojis with structured telemetry entries `{ time, icon, border, bg, color, text }`.
+    - Each simulator step renders with a dedicated custom-colored Lucide icon badge, high-contrast monospace timestamp, and crisp telemetry message.
+  - [x] **🔔 Dynamic Toast & Filter System:**
+    - Upgraded `showToast()` to map any status or action directly to a custom-colored Lucide icon.
+    - Upgraded all filter category pills to display custom-colored Lucide icons.
 
 ---
 
