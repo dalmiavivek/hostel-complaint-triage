@@ -38,11 +38,14 @@ def health_check():
     """Verify Ollama connection or Groq Cloud readiness."""
     groq_key = os.environ.get("GROQ_API_KEY")
     if groq_key:
+        groq_model = os.environ.get("GROQ_MODEL", "llama-3.1-8b-instant")
+        if "gemma" in groq_model.lower():
+            groq_model = "llama-3.1-8b-instant"
         return jsonify({
             "status": "online",
             "cloud": True,
-            "provider": "Groq Cloud (Gemma)",
-            "active_model": os.environ.get("GROQ_MODEL", "gemma2-9b-it")
+            "provider": "Groq Cloud",
+            "active_model": groq_model
         })
 
     try:

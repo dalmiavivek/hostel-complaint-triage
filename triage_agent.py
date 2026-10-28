@@ -189,8 +189,17 @@ def triage_hostel_chat(
 
     try:
         if groq_key:
-            logger.info("Dispatching triage request to Groq Cloud (Gemma)...")
-            groq_model = os.environ.get("GROQ_MODEL", "gemma2-9b-it")
+            logger.info("Dispatching triage request to Groq Cloud...")
+            groq_model = os.environ.get("GROQ_MODEL", "llama-3.1-8b-instant").strip()
+            # Auto-route: Groq deprecated 'gemma2-9b-it' in favor of fast open-source Llama 3.1
+            if "gemma" in groq_model.lower():
+                logger.info(f"Mapping deprecated '{groq_model}' to active 'llama-3.1-8b-instant'")
+                groq_model = "llama-3.1-8b-instant"
+
+            headers = {
+                "Authorization": f"Bearer {groq_key.strip()}",
+                "Content-Type": "application/json"
+            }
             groq_payload = {
                 "model": groq_model,
                 "messages": [
@@ -202,15 +211,29 @@ def triage_hostel_chat(
             }
             res = requests.post(
                 "https://api.groq.com/openai/v1/chat/completions",
-                headers={
-                    "Authorization": f"Bearer {groq_key}",
-                    "Content-Type": "application/json"
-                },
+                headers=headers,
                 json=groq_payload,
                 timeout=timeout
             )
-            res.raise_for_status()
-            raw_llm_output = res.json()["choices"][0]["message"]["content"] or ""
+            # If response_format causes an error on certain models, retry without it
+            if res.status_code == 400 and "response_format" in res.text:
+                logger.warning("Retrying without response_format...")
+                groq_payload.pop("response_format", None)
+                res = requests.post(
+                    "https://api.groq.com/openai/v1/chat/completions",
+                    headers=headers,
+                    json=groq_payload,
+                    timeout=timeout
+                )
+            if not res.ok:
+                try:
+                    err_msg = res.json().get("error", {}).get("message", res.text)
+                except Exception:
+                    err_msg = res.text
+                raise ValueError(f"Groq API error ({res.status_code}): {err_msg}")
+
+            res_json = res.json()
+            raw_llm_output = res_json["choices"][0]["message"]["content"] or ""
             model_used = f"Groq Cloud ({groq_model})"
         else:
             logger.info(f"Dispatching triage request to Ollama ({model})...")

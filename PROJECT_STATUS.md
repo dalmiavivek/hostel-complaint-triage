@@ -123,7 +123,10 @@ flowchart TD
   - [x] Created `docker-compose.yml` for unified Ollama + Web container orchestration
   - [x] Created `Procfile` for cloud hosting (Render / Railway)
   - [x] Added `vercel.json` and Vercel Python Serverless adapter
-  - [x] Added dual-mode inference: Local Ollama Gemma 4 + Free Cloud Gemma fallback (`GROQ_API_KEY`)
+  - [x] Added dual-mode inference: Local Ollama Gemma 4 + Free Cloud Gemma/Llama fallback (`GROQ_API_KEY`)
+  - [x] Resolved Vercel Groq 400 Client Error:
+    - *Cause:* Groq retired `gemma2-9b-it` and lacked JSON mode for it.
+    - *Fix:* Auto-routed cloud requests to Groq's active high-speed `llama-3.1-8b-instant` model with auto-retry if `response_format` is unsupported.
   - [x] Created `DEPLOYMENT_GUIDE.md` and `VERCEL_DEPLOYMENT.md` with step-by-step instructions
 
 ---
